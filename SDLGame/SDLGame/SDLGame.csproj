@@ -61,12 +61,14 @@
     <Compile Include="Game.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Lunatics\Game.cs" />
+    <Compile Include="Lunatics\Graphics\Animation.cs" />
     <Compile Include="Lunatics\Graphics\Renderer.cs" />
     <Compile Include="Lunatics\Graphics\Sprite.cs" />
     <Compile Include="Lunatics\Graphics\Texture2D.cs" />
+    <Compile Include="Lunatics\Graphics\TextureAtlas.cs" />
+    <Compile Include="Lunatics\Graphics\TextureRegion2D.cs" />
     <Compile Include="Lunatics\Input\Keyboard.cs" />
     <Compile Include="Lunatics\Input\Mouse.cs" />
-    <Compile Include="Lunatics\Math\Vector2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SDL2.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Spatials\Explosion.cs" />
     <Compile Include="Spatials\Missile.cs" />
     <Compile Include="Spatials\PlayerShip.cs" />
+    <Compile Include="Systems\AnimationSystem.cs" />
     <Compile Include="Systems\CollisionSystem.cs" />
     <Compile Include="Systems\EnemyShipMovementSystem.cs" />
     <Compile Include="Systems\EnemyShooterSystem.cs" />
@@ -137,6 +140,9 @@
     <Content Include="assets\explosion.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="assets\motw.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="assets\player.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -157,6 +163,13 @@
     <PackageReference Include="StbImageSharp">
       <Version>2.22.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lunatics.Framework\Lunatics.Framework.csproj">
+      <Project>{217C80CF-675F-4354-8D8B-FC91058EE342}</Project>
+      <Name>Lunatics.Framework</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

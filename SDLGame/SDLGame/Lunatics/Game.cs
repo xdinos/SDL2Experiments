@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Lunatics.Input;
 
 namespace Lunatics
@@ -205,6 +206,11 @@ namespace Lunatics
 						break;
 				}
 			}
+
+			var currentKeyStatesPtr = SDL.SDL_GetKeyboardState(out var size);
+			var currentKeyStates = new byte[size];
+			Marshal.Copy(currentKeyStatesPtr, currentKeyStates, 0, currentKeyStates.Length);
+
 		}
 
 		private void Render()

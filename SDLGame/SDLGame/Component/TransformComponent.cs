@@ -1,6 +1,6 @@
 ﻿using Artemis;
 using Artemis.Attributes;
-using Lunatics.Math;
+using Lunatics.Framework.Math;
 
 namespace SDLGame.Component
 {

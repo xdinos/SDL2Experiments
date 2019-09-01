@@ -1,35 +1,23 @@
 ﻿using System;
-using System.Drawing;
-using Lunatics.Math;
 
 namespace Lunatics.Graphics
 {
-	public class TextureRegion2D
-	{
-		public Texture2D Texture { get; protected set; }
-		public int X { get; }
-		public int Y { get; }
-		public int Width { get; }
-		public int Height { get; }
-
-		public TextureRegion2D(Texture2D texture)
-			: this(texture, 0, 0, texture.Width, texture.Height)
-		{
-		}
-
-		public TextureRegion2D(Texture2D texture, int x, int y, int width, int height)
-		{
-			Texture = texture;
-			X = x;
-			Y = y;
-			Width = width;
-			Height = height;
-		}
-	}
-
 	public class Sprite
 	{
-		public TextureRegion2D TextureRegion => _textureRegion;
+		public TextureRegion2D TextureRegion
+		{
+			get => _textureRegion;
+			protected set
+			{
+				if (value == null)
+					throw new InvalidOperationException("TextureRegion cannot be null");
+
+				// preserve the origin if the texture size changes
+				//TODO: var originNormalized = OriginNormalized;
+				_textureRegion = value;
+				//TODO: OriginNormalized = originNormalized;
+			}
+		}
 
 		public Sprite(TextureRegion2D textureRegion)
 		{

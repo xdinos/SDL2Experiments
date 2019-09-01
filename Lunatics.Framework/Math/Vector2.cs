@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Lunatics.Math
+namespace Lunatics.Framework.Math
 {
 	[Serializable]
 	[StructLayout(LayoutKind.Sequential)]

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Lunatics.Math;
+using Lunatics.Framework.Math;
 using SDL2;
 
 namespace Lunatics.Graphics
@@ -42,7 +42,17 @@ namespace Lunatics.Graphics
 			SDL.SDL_RenderPresent(_handle);
 		}
 
-		public void Draw(Sprite sprite, Vector2 position, float rotation, Vector2 scale)
+		public void Draw(Sprite sprite,
+		                 Vector2 position)
+		{
+			Draw(sprite, position, Vector2.Zero, 0f, Vector2.One);
+		}
+
+		public void Draw(Sprite sprite,
+		                 Vector2 position,
+		                 Vector2 origin,
+		                 float rotation,
+						 Vector2 scale)
 		{
 			if (sprite == null) throw new ArgumentNullException(nameof(sprite));
 
@@ -58,8 +68,8 @@ namespace Lunatics.Graphics
 
 			var dst = new SDL.SDL_Rect
 			          {
-				          x = (int) position.X,
-				          y = (int) position.Y,
+				          x = (int) (position.X - origin.X * scale.X),
+				          y = (int) (position.Y - origin.Y * scale.Y),
 				          w = (int) (sprite.TextureRegion.Width * scale.X),
 				          h = (int) (sprite.TextureRegion.Height * scale.Y)
 			          };
@@ -72,7 +82,7 @@ namespace Lunatics.Graphics
 			                     IntPtr.Zero,
 			                     SDL.SDL_RendererFlip.SDL_FLIP_NONE);
 		}
-		
+
 
 		private IntPtr _handle;
 	}

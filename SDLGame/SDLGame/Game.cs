@@ -4,6 +4,8 @@ using System.Diagnostics.Eventing.Reader;
 using System.Runtime.InteropServices;
 using Artemis;
 using Artemis.System;
+using Lunatics.Framework.Math;
+using Lunatics.Graphics;
 using SDL2;
 using SDLGame.Component;
 using SDLGame.Templates;
@@ -18,17 +20,23 @@ namespace SDLGame
 		}
 
 		public SDL.SDL_DisplayMode _displayMode;
+		private AnimatedSprite _motwSprite;
 
 		protected override void LoadResources()
 		{
 			if (Renderer == null)
 				return;
 
-			//_texturePtr = TextureManager.LoadTexture(_rendererPtr, "assets/tilemap_packed.png");
-
-			//_player = new GameObject(_rendererPtr, _texturePtr, 408, 0, 16, 16);
-
-			//_tileMap = TileMap.Load(_rendererPtr, "assets", "map.json");
+			var motwTexture = Texture2D.Load(Renderer.Handle, "assets/motw.png");
+			var motwAtlas = TextureAtlas.Create("assets/motw-atlas", motwTexture, 52, 72);
+			var motwAnimationFactory = new SpriteSheetAnimationFactory(motwAtlas);
+			motwAnimationFactory.Add("idle", new SpriteSheetAnimationData(new[] { 0 }));
+			motwAnimationFactory.Add("walkSouth", new SpriteSheetAnimationData(new[] { 0, 1, 2, 1 }, isLooping: false));
+			motwAnimationFactory.Add("walkWest", new SpriteSheetAnimationData(new[] { 12, 13, 14, 13 }, isLooping: false));
+			motwAnimationFactory.Add("walkEast", new SpriteSheetAnimationData(new[] { 24, 25, 26, 25 }, isLooping: false));
+			motwAnimationFactory.Add("walkNorth", new SpriteSheetAnimationData(new[] { 36, 37, 38, 37 }, isLooping: false));
+			_motwSprite = new AnimatedSprite(motwAnimationFactory);// { Position = new Vector2(20, 20) };
+			_motwSprite.Play("walkSouth").IsLooping = true;
 
 			SDL.SDL_GetWindowDisplayMode(WindowHandle, out _displayMode);
 
@@ -37,6 +45,7 @@ namespace SDLGame
 			_entityWorld = new EntityWorld();
 
 			EntitySystem.BlackBoard.SetEntry("rendererPtr", Renderer.Handle);
+			EntitySystem.BlackBoard.SetEntry(nameof(Lunatics.Graphics.Renderer), Renderer);
 			EntitySystem.BlackBoard.SetEntry("EnemyInterval", 500);
 			EntitySystem.BlackBoard.SetEntry("Game", this);
 
@@ -44,6 +53,17 @@ namespace SDLGame
 			
 			InitializePlayerShip(_displayMode.w, _displayMode.h);
 			InitializeEnemyShips(_displayMode.w, _displayMode.h);
+
+			var entity = _entityWorld.CreateEntity();
+			//entity.Group = "SHIPS";
+
+			entity.AddComponentFromPool<TransformComponent>();
+			entity.AddComponent(new AnimationComponent(_motwSprite));
+			entity.AddComponent(new SpatialFormComponent("Character") {Sprite = _motwSprite});
+			
+			entity.GetComponent<TransformComponent>().X = 100f;
+			entity.GetComponent<TransformComponent>().Y = 100f;
+			entity.Tag = "CHARACTER";
 		}
 		
 		protected override void Update(TimeSpan elapsedGameTime)
@@ -52,6 +72,8 @@ namespace SDLGame
 			//_player.Update();
 
 			_entityWorld.Update(elapsedGameTime.Ticks);
+
+			
 
 			++frameCounter;
 			elapsedTime += elapsedGameTime;
@@ -96,7 +118,7 @@ namespace SDLGame
 			entity.Group = "SHIPS";
 
 			entity.AddComponentFromPool<TransformComponent>();
-			entity.AddComponent(new SpatialFormComponent("PlayerShip"));
+			entity.AddComponent(new SpatialFormComponent("PlayerShip"){ Sprite = new Sprite(Texture2D.Load(Renderer.Handle, "assets/player.png"))});
 			entity.AddComponent(new HealthComponent(30));
 
 			entity.GetComponent<TransformComponent>().X = width * 0.5f;

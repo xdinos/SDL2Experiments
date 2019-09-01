@@ -3,6 +3,8 @@ using Artemis;
 using Artemis.System;
 using Artemis.Attributes;
 using Artemis.Manager;
+using Lunatics.Framework.Math;
+using Lunatics.Graphics;
 using SDL2;
 using SDLGame.Component;
 using SDLGame.Spatials;
@@ -14,14 +16,14 @@ namespace SDLGame.Systems
 	public class RenderSystem : EntityComponentProcessingSystem<SpatialFormComponent, TransformComponent>
 	{
 		private Game _game;
-		private IntPtr _rendererPtr;
+		private Renderer _renderer;
 		
 
 		/// <summary>Override to implement code that gets executed when systems are initialized.</summary>
 		public override void LoadContent()
 		{
 			_game = BlackBoard.GetEntry<Game>("Game");
-			_rendererPtr = BlackBoard.GetEntry<IntPtr>("rendererPtr");
+			_renderer = BlackBoard.GetEntry<Renderer>(nameof(Renderer));
 		}
 
 		public override void Process(Entity entity, SpatialFormComponent spatialFormComponent, TransformComponent transformComponent)
@@ -35,22 +37,31 @@ namespace SDLGame.Systems
 					transformComponent.X < _game._displayMode.w && 
 					transformComponent.Y < _game._displayMode.h)
 				{
-					// very naive render ...
-					if (string.Compare("PlayerShip", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
+					if (spatialFormComponent.Sprite != null)
 					{
-						PlayerShip.Render(_rendererPtr, transformComponent);
+						_renderer.Draw(spatialFormComponent.Sprite,
+						               transformComponent.Position,
+						               new Vector2(spatialFormComponent.Sprite.TextureRegion.Width * 0.5f,
+						                           spatialFormComponent.Sprite.TextureRegion.Height * 0.5f),
+						               0f,
+									   Vector2.One);
+					}
+					// very naive render ...
+					else if (string.Compare("PlayerShip", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
+					{
+						PlayerShip.Render(_renderer.Handle, transformComponent);
 					}
 					else if (string.Compare("Missile", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
 					{
-						Missile.Render(_rendererPtr, transformComponent);
+						Missile.Render(_renderer.Handle, transformComponent);
 					}
 					else if (string.Compare("EnemyShip", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
 					{
-						EnemyShip.Render(_rendererPtr, transformComponent);
+						EnemyShip.Render(_renderer.Handle, transformComponent);
 					}
 					else if (string.Compare("BulletExplosion", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
 					{
-						Explosion.Render(_rendererPtr, transformComponent,10);
+						Explosion.Render(_renderer.Handle, transformComponent,10);
 					}
 					else if (string.Compare("ShipExplosion", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
 					{
