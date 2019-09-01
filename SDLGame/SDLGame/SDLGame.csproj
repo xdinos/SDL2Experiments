@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3FF487A3-3727-42D3-9B1E-244196C3976F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>SDLGame</RootNamespace>
+    <AssemblyName>SDLGame</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BMFont.cs" />
+    <Compile Include="Component\EnemyComponent.cs" />
+    <Compile Include="Component\ExpiresComponent.cs" />
+    <Compile Include="Component\HealthComponent.cs" />
+    <Compile Include="Component\SpatialFormComponent.cs" />
+    <Compile Include="Component\TransformComponent.cs" />
+    <Compile Include="Component\VelocityComponent.cs" />
+    <Compile Include="Component\WeaponComponent.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GameObject.cs" />
+    <Compile Include="Lunatics\Game.cs" />
+    <Compile Include="Lunatics\Graphics\Renderer.cs" />
+    <Compile Include="Lunatics\Graphics\Sprite.cs" />
+    <Compile Include="Lunatics\Graphics\Texture2D.cs" />
+    <Compile Include="Lunatics\Input\Keyboard.cs" />
+    <Compile Include="Lunatics\Input\Mouse.cs" />
+    <Compile Include="Lunatics\Math\Vector2.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SDL2.cs" />
+    <Compile Include="SDL_ttf.cs" />
+    <Compile Include="Spatials\EnemyShip.cs" />
+    <Compile Include="Spatials\Explosion.cs" />
+    <Compile Include="Spatials\Missile.cs" />
+    <Compile Include="Spatials\PlayerShip.cs" />
+    <Compile Include="Systems\CollisionSystem.cs" />
+    <Compile Include="Systems\EnemyShipMovementSystem.cs" />
+    <Compile Include="Systems\EnemyShooterSystem.cs" />
+    <Compile Include="Systems\EnemySpawnSystem.cs" />
+    <Compile Include="Systems\ExpirationSystem.cs" />
+    <Compile Include="Systems\HealthBarRenderSystem.cs" />
+    <Compile Include="Systems\HudRenderSystem.cs" />
+    <Compile Include="Systems\MovementSystem.cs" />
+    <Compile Include="Systems\PlayerShipControlSystem.cs" />
+    <Compile Include="Systems\RenderSystem.cs" />
+    <Compile Include="Templates\BulletExplosionTemplate.cs" />
+    <Compile Include="Templates\EnemyShipTemplate.cs" />
+    <Compile Include="Templates\MissileTemplate.cs" />
+    <Compile Include="Templates\ShipExplosionTemplate.cs" />
+    <Compile Include="TextureManager.cs" />
+    <Compile Include="TileMap.cs" />
+    <Compile Include="Lunatics\Utils\JsonCreationConverter.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="assets\map.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\roboto-regular-16pt.fnt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\tilemap_packed.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\libs\x64\SDL2.dll">
+      <Link>SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\bullet.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\enemy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\explosion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\player.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\roboto-regular-16pt_0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\tilemap_packed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Artemis">
+      <Version>1.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="StbImageSharp">
+      <Version>2.22.2</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
