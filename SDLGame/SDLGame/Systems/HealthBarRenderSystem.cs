@@ -3,6 +3,7 @@ using Artemis;
 using Artemis.Attributes;
 using Artemis.Manager;
 using Artemis.System;
+using Lunatics.Graphics;
 using SDLGame.Component;
 
 namespace SDLGame.Systems
@@ -11,12 +12,12 @@ namespace SDLGame.Systems
 	public class HealthBarRenderSystem : EntityComponentProcessingSystem<HealthComponent, TransformComponent>
 	{
 		private Game _game;
-		private IntPtr _renderer;
+		private Renderer _renderer;
 
 		public override void LoadContent()
 		{
 			_game = BlackBoard.GetEntry<Game>("Game");
-			_renderer = BlackBoard.GetEntry<IntPtr>("rendererPtr");
+			_renderer = BlackBoard.GetEntry<Renderer>(nameof(Lunatics.Graphics.Renderer));
 		}
 
 		public override void Process(Entity entity, HealthComponent healthComponent, TransformComponent transformComponent)

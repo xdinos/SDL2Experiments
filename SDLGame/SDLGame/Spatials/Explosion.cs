@@ -1,30 +1,20 @@
-﻿using System;
+﻿using Lunatics.Framework.Mathematics;
 using Lunatics.Graphics;
-using SDL2;
 using SDLGame.Component;
 
 namespace SDLGame.Spatials
 {
 	internal static class Explosion
 	{
-		private static Texture2D _texture;
+		private static Sprite _sprite;
 
-		public static void Render(IntPtr rendererPtr, TransformComponent transformComponent, int radius)
+		public static void Render(Renderer renderer, TransformComponent transformComponent, int radius)
 		{
-			if (_texture == null)
-				_texture = Texture2D.Load(rendererPtr, "assets/explosion.png");
+			if (_sprite == null)
+				_sprite = new Sprite(Texture2D.Load(renderer, "assets/explosion.png"));
 
-			//var src = new SDL.SDL_Rect { h = TileHeight, w = TileWidth, x = tx * TileWidth, y = ty * TileHeight };
-			var dst = new SDL.SDL_Rect {h = (int) (_texture.Height * 0.3f), w = (int) (_texture.Width* 0.3f)};
-			dst.x = (int)(transformComponent.X - radius);
-			dst.y = (int)(transformComponent.Y - radius);
-
-			SDL.SDL_RenderCopyEx(rendererPtr, 
-			                     _texture.Handle,
-			                     IntPtr.Zero,
-			                     ref dst,
-			                     0D, IntPtr.Zero,
-			                     SDL.SDL_RendererFlip.SDL_FLIP_NONE);
+			var position = new Vector2(transformComponent.X - radius, transformComponent.Y - radius);
+			renderer.Draw(_sprite, position, Vector2.Zero, 0f, new Vector2(0.3f));
 		}
 	}
 }

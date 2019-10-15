@@ -3,7 +3,7 @@ using Artemis;
 using Artemis.Attributes;
 using Artemis.Manager;
 using Artemis.System;
-using Lunatics.Framework.Math;
+using Lunatics.Framework.Mathematics;
 using SDLGame.Component;
 using SDLGame.Templates;
 

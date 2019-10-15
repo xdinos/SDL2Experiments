@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDLGame", "SDLGame\SDLGame.csproj", "{3FF487A3-3727-42D3-9B1E-244196C3976F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lunatics.Framework", "..\Lunatics.Framework\Lunatics.Framework.csproj", "{217C80CF-675F-4354-8D8B-FC91058EE342}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lunatics.Framework", "..\Lunatics.Framework\Lunatics.Framework.csproj", "{217C80CF-675F-4354-8D8B-FC91058EE342}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lunatics.Framework.Sdl", "..\Lunatics.Framework.SDL2\Lunatics.Framework.Sdl.csproj", "{74CC87BB-2284-43D7-9720-00B829FB9BA5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lunatics.Tiled", "..\Lunatics.Tiled\Lunatics.Tiled.csproj", "{BE5D0A78-6EAA-4239-BB96-01C65CD46E6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{217C80CF-675F-4354-8D8B-FC91058EE342}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{217C80CF-675F-4354-8D8B-FC91058EE342}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{217C80CF-675F-4354-8D8B-FC91058EE342}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74CC87BB-2284-43D7-9720-00B829FB9BA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74CC87BB-2284-43D7-9720-00B829FB9BA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74CC87BB-2284-43D7-9720-00B829FB9BA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74CC87BB-2284-43D7-9720-00B829FB9BA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE5D0A78-6EAA-4239-BB96-01C65CD46E6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE5D0A78-6EAA-4239-BB96-01C65CD46E6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE5D0A78-6EAA-4239-BB96-01C65CD46E6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE5D0A78-6EAA-4239-BB96-01C65CD46E6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

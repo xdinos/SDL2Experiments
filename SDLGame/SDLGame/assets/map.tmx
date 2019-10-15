@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="1" nextlayerid="11" nextobjectid="18">
- <tileset firstgid="1" source="tilemap_packed.json"/>
+ <tileset firstgid="1" name="tilemap_packed" tilewidth="16" tileheight="16" tilecount="486" columns="27">
+  <image source="tilemap_packed.png" width="432" height="288"/>
+ </tileset>
  <layer id="1" name="Terrain" width="32" height="16">
   <data encoding="csv">
    <chunk x="-32" y="-16" width="16" height="16">

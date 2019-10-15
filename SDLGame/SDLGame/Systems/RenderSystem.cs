@@ -3,7 +3,7 @@ using Artemis;
 using Artemis.System;
 using Artemis.Attributes;
 using Artemis.Manager;
-using Lunatics.Framework.Math;
+using Lunatics.Framework.Mathematics;
 using Lunatics.Graphics;
 using SDL2;
 using SDLGame.Component;
@@ -41,27 +41,26 @@ namespace SDLGame.Systems
 					{
 						_renderer.Draw(spatialFormComponent.Sprite,
 						               transformComponent.Position,
-						               new Vector2(spatialFormComponent.Sprite.TextureRegion.Width * 0.5f,
-						                           spatialFormComponent.Sprite.TextureRegion.Height * 0.5f),
+						               new Vector2(0.5f, 0.5f),
 						               0f,
 									   Vector2.One);
 					}
 					// very naive render ...
 					else if (string.Compare("PlayerShip", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
 					{
-						PlayerShip.Render(_renderer.Handle, transformComponent);
+						PlayerShip.Render(_renderer, transformComponent);
 					}
 					else if (string.Compare("Missile", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
 					{
-						Missile.Render(_renderer.Handle, transformComponent);
+						Missile.Render(_renderer, transformComponent);
 					}
 					else if (string.Compare("EnemyShip", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
 					{
-						EnemyShip.Render(_renderer.Handle, transformComponent);
+						EnemyShip.Render(_renderer, transformComponent);
 					}
 					else if (string.Compare("BulletExplosion", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
 					{
-						Explosion.Render(_renderer.Handle, transformComponent,10);
+						Explosion.Render(_renderer, transformComponent,10);
 					}
 					else if (string.Compare("ShipExplosion", spatialName, StringComparison.InvariantCultureIgnoreCase) == 0)
 					{

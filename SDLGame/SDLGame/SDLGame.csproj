@@ -50,7 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BMFont.cs" />
+    <Compile Include="AdvEn\Engine.cs" />
+    <Compile Include="AdvEn\Object.cs" />
+    <Compile Include="AdvEn\Room.cs" />
+    <Compile Include="AdvEn\RoomLayer.cs" />
+    <Compile Include="AdvEn\Scaling.cs" />
+    <Compile Include="AdvEn\Sprite.cs" />
     <Compile Include="Component\EnemyComponent.cs" />
     <Compile Include="Component\ExpiresComponent.cs" />
     <Compile Include="Component\HealthComponent.cs" />
@@ -59,20 +64,10 @@
     <Compile Include="Component\VelocityComponent.cs" />
     <Compile Include="Component\WeaponComponent.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="GameObject.cs" />
-    <Compile Include="Lunatics\Game.cs" />
-    <Compile Include="Lunatics\Graphics\Animation.cs" />
-    <Compile Include="Lunatics\Graphics\Renderer.cs" />
-    <Compile Include="Lunatics\Graphics\Sprite.cs" />
-    <Compile Include="Lunatics\Graphics\Texture2D.cs" />
-    <Compile Include="Lunatics\Graphics\TextureAtlas.cs" />
-    <Compile Include="Lunatics\Graphics\TextureRegion2D.cs" />
-    <Compile Include="Lunatics\Input\Keyboard.cs" />
-    <Compile Include="Lunatics\Input\Mouse.cs" />
+    <Compile Include="GGPack.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SDL2.cs" />
-    <Compile Include="SDL_ttf.cs" />
+    <Compile Include="ScriptEngine.cs" />
     <Compile Include="Spatials\EnemyShip.cs" />
     <Compile Include="Spatials\Explosion.cs" />
     <Compile Include="Spatials\Missile.cs" />
@@ -92,9 +87,7 @@
     <Compile Include="Templates\EnemyShipTemplate.cs" />
     <Compile Include="Templates\MissileTemplate.cs" />
     <Compile Include="Templates\ShipExplosionTemplate.cs" />
-    <Compile Include="TextureManager.cs" />
-    <Compile Include="TileMap.cs" />
-    <Compile Include="Lunatics\Utils\JsonCreationConverter.cs" />
+    <Compile Include="TiledMapRenderer.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -104,12 +97,18 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="assets\countries.geojson">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="assets\map.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="assets\roboto-regular-16pt.fnt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="assets\TestScript.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="assets\tilemap_packed.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -157,6 +156,12 @@
     <PackageReference Include="Artemis">
       <Version>1.3.1</Version>
     </PackageReference>
+    <PackageReference Include="GeoJSON.Net">
+      <Version>1.1.73</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting">
+      <Version>3.2.1</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.2</Version>
     </PackageReference>
@@ -166,9 +171,17 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\..\Lunatics.Framework.SDL2\Lunatics.Framework.Sdl.csproj">
+      <Project>{74cc87bb-2284-43d7-9720-00b829fb9ba5}</Project>
+      <Name>Lunatics.Framework.Sdl</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Lunatics.Framework\Lunatics.Framework.csproj">
       <Project>{217C80CF-675F-4354-8D8B-FC91058EE342}</Project>
       <Name>Lunatics.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lunatics.Tiled\Lunatics.Tiled.csproj">
+      <Project>{be5d0a78-6eaa-4239-bb96-01c65cd46e6a}</Project>
+      <Name>Lunatics.Tiled</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
