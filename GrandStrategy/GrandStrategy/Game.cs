@@ -21,12 +21,12 @@ namespace GrandStrategy
 			base.Initialize();
 		}
 
-		protected override void Dispose(bool disposing)
-		{
-			base.Dispose(disposing);
-		}
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
 
-		private readonly string VertexShaderCode =
+        private readonly string VertexShaderCode =
 			@"#version 330 core 
 layout(location = 0) in vec3 vertexPosition_modelspace;
 layout(location = 1) in vec4 vertexColor;
@@ -106,7 +106,7 @@ void main() {
 		protected override void Draw(TimeSpan elapsedGameTime)
 		{
 			GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil,
-			                     new Vector4(0f, 0f, 0f, 1f), 1f, 0);
+			                     new Vector4(1f, 0f, 0f, 1f), 1f, 0);
 
 			var vp = GraphicsDevice.Viewport;
 			var projection = Matrix.PerspectiveFovRH(MathUtils.DegreesToRadians(45f), 

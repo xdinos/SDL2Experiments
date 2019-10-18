@@ -1,15 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize></Optimize>
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors></TreatWarningsAsErrors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IntermediateOutputPath></IntermediateOutputPath>
+    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+    <LangVersion>Default</LangVersion>
+    <NoStdLib></NoStdLib>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <NoStdLib>true</NoStdLib>
+    <IntermediateOutputPath>obj\Debug\netstandard2.1</IntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,4 +41,9 @@
     <ProjectReference Include="..\Lunatics.Mathematics\Lunatics.Mathematics.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="libSDL2-2.0.0.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

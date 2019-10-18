@@ -85,16 +85,21 @@ namespace Lunatics.Framework.DesktopGL
 			Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 8/*stencilSize*/);
 			Sdl.GL.SetAttribute(Sdl.GL.Attribute.DoubleBuffer, 1);
 
-			// TODO: ???
-			//Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextProfileMask, (int)Sdl.GL.ContextProfile.Core);
-			//Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 3);
-			//Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 3);
-			
-#if DEBUG
-			Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, (int)Sdl.GL.Context.Debug);
-#endif
+            // TODO: ???
+            if (Environment.GetEnvironmentVariable("OPENGL_FORCE_CORE_PROFILE") == "1")
+            {
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextProfileMask, (int)Sdl.GL.ContextProfile.Core);
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 3);
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 3);
+            }
 
-			initFlags |= Sdl.Window.Flags.OpenGL;
+            var contextFlags = Sdl.GL.Context.ForwardCompatible;
+#if DEBUG
+            contextFlags |= Sdl.GL.Context.Debug;
+            //Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, (int)Sdl.GL.Context.Debug);
+#endif
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, (int)contextFlags);
+            initFlags |= Sdl.Window.Flags.OpenGL;
 
 			var handle = Sdl.Window.Create(GetDefaultWindowTitle(), 
 			                               Sdl.Window.PosCentered,

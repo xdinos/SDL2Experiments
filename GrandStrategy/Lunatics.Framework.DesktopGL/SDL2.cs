@@ -614,16 +614,17 @@ namespace Lunatics.Framework.DesktopGL
 					                                       ? Path.Combine(assemblyLocation, "x64/SDL2.dll")
 					                                       : Path.Combine(assemblyLocation, "x86/SDL2.dll"));
 			}
-			else if (Environment.OSVersion.Platform == PlatformID.Unix)
+            else if (Environment.OSVersion.IsMacOSX())
+            {
+                result = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "libSDL2-2.0.0.dylib"));
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Unix)
 			{
 				result = FuncLoader.LoadLibrary(Environment.Is64BitProcess
 					                                       ? Path.Combine(assemblyLocation, "x64/libSDL2-2.0.so.0")
 					                                       : Path.Combine(assemblyLocation, "x86/libSDL2-2.0.so.0"));
 			}
-			else if (Environment.OSVersion.IsMacOSX())
-			{
-				result = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "libSDL2-2.0.0.dylib"));
-			}
+			
 
 			if (result == IntPtr.Zero)
 			{

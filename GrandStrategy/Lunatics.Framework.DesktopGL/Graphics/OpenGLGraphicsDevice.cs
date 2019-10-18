@@ -43,13 +43,15 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 				throw new NotSupportedException("Unrecognized window depth/stencil format!");
 			}
 
-			OpenGL.GL.LoadEntryPoints();
+            _useCoreProfile = Environment.GetEnvironmentVariable("OPENGL_FORCE_CORE_PROFILE") == "1";
+
+			OpenGL.GL.LoadEntryPoints(_useCoreProfile);
 
 			string renderer = OpenGL.GL.GetString(OpenGL.StringName.Renderer);
 			string version = OpenGL.GL.GetString(OpenGL.StringName.Version);
 			string vendor = OpenGL.GL.GetString(OpenGL.StringName.Vendor);
 			string shadingLanguageVersion = OpenGL.GL.GetString(OpenGL.StringName.ShadingLanguageVersion);
-			var extensions = OpenGL.GL.GetString(OpenGL.StringName.Extensions);
+			//var extensions = OpenGL.GL.GetString(OpenGL.StringName.Extensions);
 
 			BlendState = BlendState.Opaque;
 			DepthStencilState = DepthStencilState.Default;
@@ -117,7 +119,16 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 			//ScissorRectangle = Viewport.Bounds;
 
 			_programCache = new ShaderProgramCache(this);
+
+            if (_useCoreProfile)
+            {
+                OpenGL.GL.GenVertexArrays(1, out _vao);
+                OpenGL.GL.BindVertexArray(_vao);
+            }
 		}
+
+        private bool _useCoreProfile = false;
+        private uint _vao;
 		
 		public override void SetVertexBuffer(VertexBuffer vertexBuffer, int vertexOffset)
 		{

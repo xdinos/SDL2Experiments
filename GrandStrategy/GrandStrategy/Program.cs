@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace GrandStrategy
 {
@@ -10,6 +9,7 @@ namespace GrandStrategy
 	{
 		static void Main()
 		{
+            Environment.SetEnvironmentVariable("OPENGL_FORCE_CORE_PROFILE", "1");
 			using (var game = new Game())
 			{
 				game.Run();

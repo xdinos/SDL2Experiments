@@ -1019,14 +1019,27 @@ namespace Lunatics.Framework.DesktopGL
 			internal delegate void DrawRangeElementsBaseVertexDelegate(PrimitiveType mode, int start, int end, int count, DrawElementsType type, IntPtr indices, int baseVertex);
 			internal static DrawRangeElementsBaseVertexDelegate DrawRangeElementsBaseVertex;
 
-			[System.Diagnostics.Conditional("DEBUG")]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+            internal delegate void GenVertexArraysDelegate(int n, out uint arrays);
+            internal static GenVertexArraysDelegate GenVertexArrays;
+
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+            internal delegate void DeleteVertexArraysDelegate(int n, ref uint arrays);
+            internal static DeleteVertexArraysDelegate DeleteVertexArrays;
+
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+            internal delegate void BindVertexArrayDelegate(uint arrays);
+            internal static BindVertexArrayDelegate BindVertexArray;
+
+            [System.Diagnostics.Conditional("DEBUG")]
 			[System.Diagnostics.DebuggerHidden]
 			public static void CheckError()
 			{
 				var error = GetError();
 				if (error != ErrorCode.NoError)
-					throw new Exception($"OpenGL.GL.GetError() returned {error}");
-			}
+                    System.Diagnostics.Debug.WriteLine($"OpenGL.GL.GetError() returned {error}");
+                //	throw new Exception($"OpenGL.GL.GetError() returned {error}");
+            }
 
 #if DEBUG
 			[UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -1201,7 +1214,7 @@ namespace Lunatics.Framework.DesktopGL
 			}
 
 
-			internal static void LoadEntryPoints()
+			internal static void LoadEntryPoints(bool useCoreProfile)
 			{
 				if (Viewport == null)
 					Viewport = LoadFunction<ViewportDelegate>("glViewport");
@@ -1378,8 +1391,16 @@ namespace Lunatics.Framework.DesktopGL
 					// Ignore the debug message callback if the entry point can not be found
 				}
 #endif
-
-				LoadExtensions();
+                if (!useCoreProfile)
+                {
+                    LoadExtensions();
+                }
+                else
+                {
+                    GenVertexArrays = LoadFunction<GenVertexArraysDelegate>("glGenVertexArrays");
+                    DeleteVertexArrays = LoadFunction<DeleteVertexArraysDelegate>("glDeleteVertexArrays");
+                    BindVertexArray = LoadFunction<BindVertexArrayDelegate>("glBindVertexArray");
+                }
 			}
 
 			private static T LoadFunction<T>(string function, bool throwIfNotFound = false)

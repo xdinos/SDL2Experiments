@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AssemblyName>GrandStrategy</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lunatics.Framework\Lunatics.Framework.csproj" />
+    <ProjectReference Include="..\Lunatics.Framework.DesktopGL\Lunatics.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\Lunatics.Mathematics\Lunatics.Mathematics.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="assets\map.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\tex.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
