@@ -21,7 +21,7 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 
 		public override void SetData<T>(T[] data)
 		{
-			SetData(0, data, 0, data.Length);
+			SetData(data, 0, data.Length);
 			//var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			//((OpenGLGraphicsDevice) GraphicsDevice).SetIndexBufferData(_buffer,
 			//                                                           0,

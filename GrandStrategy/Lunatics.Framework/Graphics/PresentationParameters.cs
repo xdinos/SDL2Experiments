@@ -1,4 +1,5 @@
 ﻿using System;
+using Lunatics.Mathematics;
 
 namespace Lunatics.Framework.Graphics
 {
@@ -15,6 +16,8 @@ namespace Lunatics.Framework.Graphics
 			get;
 			set;
 		}
+
+		public Rectangle Bounds => new Rectangle(0, 0, BackBufferWidth, BackBufferHeight);
 
 		public IntPtr DeviceWindowHandle
 		{

@@ -2094,7 +2094,7 @@ namespace Lunatics.Mathematics
 			result.M42 = (top + bottom) / (bottom - top);
 			result.M43 = -znear * zRange;
 		}
-
+		
 		/// <summary>
 		/// Creates a left-handed, customized orthographic projection matrix.
 		/// </summary>

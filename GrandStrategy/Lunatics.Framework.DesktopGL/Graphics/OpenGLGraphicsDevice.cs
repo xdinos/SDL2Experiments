@@ -51,7 +51,7 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 			string shadingLanguageVersion = OpenGL.GL.GetString(OpenGL.StringName.ShadingLanguageVersion);
 			var extensions = OpenGL.GL.GetString(OpenGL.StringName.Extensions);
 
-			BlendState = BlendState.AlphaBlend;//BlendState.Opaque;
+			BlendState = BlendState.Opaque;
 			DepthStencilState = DepthStencilState.Default;
 			RasterizerState = RasterizerState.CullCounterClockwise;
 
@@ -112,6 +112,9 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 				// TODO: dba[numAttachments] = GLenum.GL_DEPTH_ATTACHMENT;
 				// TODO: dba[numAttachments + 1] = GLenum.GL_STENCIL_ATTACHMENT;
 			}
+
+			Viewport = new Viewport(PresentationParameters.Bounds);
+			//ScissorRectangle = Viewport.Bounds;
 
 			_programCache = new ShaderProgramCache(this);
 		}
@@ -357,30 +360,7 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 			// Set up the vertex buffers
 
 			// TODO: ApplyVertexAttributes(vertexBufferBindings, vertexBufferCount, vertexBuffersUpdated, baseVertex);
-
-			OpenGL.GL.EnableVertexAttribArray(0);
-			OpenGL.GL.VertexAttribPointer(0,
-			                              VertexAttribSize[(int) VertexElementFormat.Vector3],
-			                              VertexAttribType[(int) VertexElementFormat.Vector3],
-			                              false,
-			                              16,
-			                              (IntPtr) 0);
-
-			OpenGL.GL.VertexAttribPointer(1,
-			                              VertexAttribSize[(int) VertexElementFormat.Color],
-			                              VertexAttribType[(int) VertexElementFormat.Color],
-			                              true,
-			                              24,
-			                              (IntPtr) 12);
-
-			OpenGL.GL.VertexAttribPointer(2,
-			                              VertexAttribSize[(int)VertexElementFormat.Vector2],
-			                              VertexAttribType[(int)VertexElementFormat.Vector2],
-			                              false,
-			                              24,
-			                              (IntPtr)16);
-
-			vertexBuffersUpdated = false;
+			ApplyVertexAttributes(vertexBuffersUpdated, baseVertex);
 
 			DrawIndexedPrimitives(primitiveType, 
 			                      baseVertex, 
@@ -953,7 +933,7 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 				cullFrontFace = actualMode;
 				if (cullFrontFace != CullMode.None)
 				{
-					OpenGL.GL.FrontFace(FrontFace[(int) cullFrontFace]);
+					OpenGL.GL.FrontFace(FrontFace[(int)cullFrontFace]);
 				}
 			}
 

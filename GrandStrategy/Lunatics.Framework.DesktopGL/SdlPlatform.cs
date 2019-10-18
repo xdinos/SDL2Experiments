@@ -86,9 +86,10 @@ namespace Lunatics.Framework.DesktopGL
 			Sdl.GL.SetAttribute(Sdl.GL.Attribute.DoubleBuffer, 1);
 
 			// TODO: ???
-			// Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 2);
-			// Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 1);
-
+			//Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextProfileMask, (int)Sdl.GL.ContextProfile.Core);
+			//Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 3);
+			//Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 3);
+			
 #if DEBUG
 			Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, (int)Sdl.GL.Context.Debug);
 #endif

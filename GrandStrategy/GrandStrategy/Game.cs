@@ -51,7 +51,7 @@ out vec4 color;
 void main() {
 	//color = vec3(0,1,0);
 	//color = fragmentColor;
-	color = texture( myTextureSampler, UV )*fragmentColor;
+	color = texture( myTextureSampler, UV );
 }";
 
 		protected override void LoadContent()
@@ -59,13 +59,14 @@ void main() {
 			base.LoadContent();
 
 			_mapTexture = Texture2D.Load(GraphicsDevice, "assets/map.png");
+			//_mapTexture = Texture2D.Load(GraphicsDevice, "assets/tex.png");
 			_spriteBatch = new SpriteBatch(GraphicsDevice);
 
 			_vertexShader = GraphicsDevice.CreateVertexShader(VertexShaderCode);
 			_pixelShader = GraphicsDevice.CreatePixelShader(PixelShaderCode);
 
 			_vertexBuffer = GraphicsDevice.CreateVertexBuffer(VertexPositionColorTexture.VertexDeclaration, 6, BufferUsage.None, false);
-			_vertexBuffer.SetData(_bufferData);
+			_vertexBuffer.SetData(_bufferData1);
 		}
 
 		protected override void UnloadContent()
@@ -107,29 +108,43 @@ void main() {
 			GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil,
 			                     new Vector4(0f, 0f, 0f, 1f), 1f, 0);
 
-			//_spriteBatch.Begin();
-			//_spriteBatch.Draw(_mapTexture, Vector2.Zero, Color.White);
-			//_spriteBatch.End();
-
-			var projection = Matrix.PerspectiveFovRH(MathUtils.DegreesToRadians(45f), 4f / 3f, 0.1f, 100.0f);
+			var vp = GraphicsDevice.Viewport;
+			var projection = Matrix.PerspectiveFovRH(MathUtils.DegreesToRadians(45f), 
+			                                         (float)vp.Width / vp.Height, 
+			                                         0.1f, 
+			                                         100.0f);
 			var view = Matrix.LookAtRH(
-				new Vector3(0, 0, 3), // Camera is at (4,3,3), in World Space
+				new Vector3(4, 3, 3), // Camera is at (4,3,3), in World Space
 				new Vector3(0, 0, 0), // and looks at the origin
 				new Vector3(0, 1, 0) // Head is up (set to 0,-1,0 to look upside-down)
 			);
+
 			var model = Matrix.Identity;
 			var mvp = model * view * projection;
-
-			GraphicsDevice.SetVertexBuffer(_vertexBuffer);
+			var spritePrj = Matrix.OrthoOffCenterRH(0f, vp.Width, vp.Height, 0f, 0f, 1f);
+			
 
 			GraphicsDevice.VertexShader = _vertexShader;
 			GraphicsDevice.PixelShader = _pixelShader;
+
 			
+			_vertexShader.SetMatrix4("MVP", ref spritePrj);
+			_spriteBatch.Begin();
+			_spriteBatch.Draw(_mapTexture,
+							  new Vector2(400,300), 
+							  null,
+							  Color.White,
+							  0,
+							  Vector2.Zero, //new Vector2(0.5f, 0.5f),
+							  Vector2.One, //new Vector2(0.0004f, 0.0005f),
+							  SpriteEffects.None,
+							  0);
+			_spriteBatch.End();
 
 			_vertexShader.SetMatrix4("MVP", ref mvp);
-			//_pixelShader.Set
-
+			GraphicsDevice.SetVertexBuffer(_vertexBuffer);
 			GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
+			//GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4, 0, 2);
 
 			base.Draw(elapsedGameTime);
 		}
@@ -148,7 +163,7 @@ void main() {
 		private VertexBuffer _vertexBuffer;
 		private Matrix _globalTransformation = Matrix.Identity;
 
-		private VertexPositionColorTexture[] _bufferData =
+		private VertexPositionColorTexture[] _bufferData1 =
 		{
 			new VertexPositionColorTexture(new Vector3(-1.0f, -1.0f, 0.0f), new Color(1f, 0f, 0f, 1f), new Vector2(0f,1f)),
 			new VertexPositionColorTexture(new Vector3(-1.0f, 1.0f, 0.0f), new Color(0, 1f, 0f, 1f), new Vector2(0f,0f)),
@@ -157,6 +172,33 @@ void main() {
 			new VertexPositionColorTexture(new Vector3(-1.0f, 1.0f, 0.0f), new Color(0, 1f, 0f, 1f), new Vector2(0f,0f)),
 			new VertexPositionColorTexture(new Vector3(1.0f, 1.0f, 0.0f), new Color(1f, 0f, 0f, 1f), new Vector2(1f,0f)),
 			new VertexPositionColorTexture(new Vector3(1.0f, -1.0f, 0.0f), new Color(0, 0f, 1f, 1f), new Vector2(1f,1f)),
+		};
+
+		private VertexPositionColorTexture[] _bufferData2 =
+		{
+			new VertexPositionColorTexture(new Vector3(-400f, 300f, 0.0f), Color.White, new Vector2(0f, 0f)),
+			new VertexPositionColorTexture(new Vector3(400f, 300f, 0.0f), Color.White, new Vector2(1f, 0f)),
+			new VertexPositionColorTexture(new Vector3(-400f, -300f, 0.0f), Color.White, new Vector2(0f, 1f)),
+
+			new VertexPositionColorTexture(new Vector3(400f, -300f, 0.0f), new Color(0f, 0f, 1f, 1f), new Vector2(1f, 1f)),
+			new VertexPositionColorTexture(new Vector3(-400f, -300f, 0.0f), Color.White, new Vector2(0f, 1f)),
+			new VertexPositionColorTexture(new Vector3(400f, 300f, 0.0f), Color.White, new Vector2(1f, 0f)),
+		};
+
+		private VertexPositionColorTexture[] _bufferData3 =
+		{
+			new VertexPositionColorTexture(new Vector3(-400f, 300f, 0.0f), Color.White, new Vector2(0f, 0f)),
+			new VertexPositionColorTexture(new Vector3(400f, 300f, 0.0f), Color.White, new Vector2(1f, 0f)),
+			new VertexPositionColorTexture(new Vector3(-400f, -300f, 0.0f), Color.White, new Vector2(0f, 1f)),
+			new VertexPositionColorTexture(new Vector3(400f, -300f, 0.0f), new Color(0f, 0f, 1f, 1f), new Vector2(1f, 1f)),
+		};
+
+		private VertexPositionColorTexture[] _bufferData4 =
+		{
+			new VertexPositionColorTexture(new Vector3(0f, 0f, 0.0f), Color.White, new Vector2(0f, 0f)),
+			new VertexPositionColorTexture(new Vector3(256f, 0f, 0.0f), Color.White, new Vector2(1f, 0f)),
+			new VertexPositionColorTexture(new Vector3(0f, 256f, 0.0f), Color.White, new Vector2(0f, 1f)),
+			new VertexPositionColorTexture(new Vector3(256f, 256f, 0.0f), new Color(0f, 0f, 1f, 1f), new Vector2(1f, 1f)),
 		};
 	}
 }

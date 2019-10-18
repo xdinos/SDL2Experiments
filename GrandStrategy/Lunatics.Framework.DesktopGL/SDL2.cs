@@ -535,7 +535,7 @@ namespace Lunatics.Framework.DesktopGL
 				ContextMinorVersion,
 				ContextEgl,
 				ContextFlags,
-				ContextProfileMAsl,
+				ContextProfileMask,
 				ShareWithCurrentContext,
 				FramebufferSRGBCapable,
 				ContextReleaseBehaviour,
@@ -545,9 +545,17 @@ namespace Lunatics.Framework.DesktopGL
 			public enum Context
 			{
 				Debug = 0x0001,
-				Compatible = 0x0002,
+				ForwardCompatible = 0x0002,
 				RobustAccess = 0x0004,
 				ResetIsolation = 0x0008
+			}
+
+			[Flags]
+			public enum ContextProfile
+			{
+				Core = 0x0001,
+				Compatibility = 0x0002,
+				ES = 0x0004
 			}
 
 			public static IntPtr CreateContext(IntPtr window)

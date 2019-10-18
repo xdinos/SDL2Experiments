@@ -43,7 +43,7 @@ namespace Lunatics.Framework.Graphics
 		
 		public void SetData<T>(T[] data) where T : struct
 		{
-			SetData(0, data, 0, data.Length, Marshal.SizeOf(typeof(T)));
+			SetData(data, 0, data.Length);
 			//ErrorCheck(data, 0, data.Length, Marshal.SizeOf(typeof(T)));
 
 			//GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);

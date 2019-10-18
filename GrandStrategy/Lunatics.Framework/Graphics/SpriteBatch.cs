@@ -703,6 +703,7 @@ namespace Lunatics.Framework.Graphics
 
 		#region Types
 
+		[Serializable]
 		[StructLayout(LayoutKind.Sequential, Pack = 1)]
 		public struct VertexPositionColorTexture4 : IVertexType
 		{

@@ -11,7 +11,7 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 		{
 			((OpenGLGraphicsDevice) GraphicsDevice).ActivateShaderProgram();
 			var matrixId = OpenGL.GL.GetUniformLocation(_programHandle, name);
-			OpenGL.GL.UniformMatrix4(matrixId, 1, true, ref matrix);
+			OpenGL.GL.UniformMatrix4(matrixId, 1, false, ref matrix);
 		}
 
 		internal OpenGLShader(GraphicsDevice graphicsDevice, 
