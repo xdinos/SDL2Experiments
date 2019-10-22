@@ -171,7 +171,11 @@ namespace Lunatics.Framework.DesktopGL
 		}
 
 		#region Delegates
-		
+
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+		public delegate void d_sdl_clearerror();
+		public static d_sdl_clearerror ClearError = FuncLoader.LoadFunction<d_sdl_clearerror>(NativeLibrary, "SDL_ClearError");
+
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 		public delegate void EnableScreenSaverFunc();
 		public static readonly EnableScreenSaverFunc EnableScreenSaver = FuncLoader.LoadFunction<EnableScreenSaverFunc>(NativeLibrary, "SDL_EnableScreenSaver");
@@ -384,6 +388,17 @@ namespace Lunatics.Framework.DesktopGL
 				return LogOnError(GetWindowDisplayIndex(window));
 			}
 
+			public static void SetFullscreen(IntPtr window, int flags)
+			{
+				LogOnError(SetWindowFullscreen(window, flags));
+			}
+
+			public static void SetTitle(IntPtr handle, string title)
+			{
+				var bytes = System.Text.Encoding.UTF8.GetBytes(title);
+				SDL_SetWindowTitle(handle, ref bytes[0]);
+			}
+
 			#region Delegates
 
 			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -395,12 +410,52 @@ namespace Lunatics.Framework.DesktopGL
 			public static ShowWindowFunc Show = FuncLoader.LoadFunction<ShowWindowFunc>(NativeLibrary, "SDL_ShowWindow");
 
 			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate int d_sdl_getwindowflags(IntPtr window);
+			public static d_sdl_getwindowflags GetWindowFlags = FuncLoader.LoadFunction<d_sdl_getwindowflags>(NativeLibrary, "SDL_GetWindowFlags");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate void d_sdl_setwindowicon(IntPtr window, IntPtr icon);
+			public static d_sdl_setwindowicon SetIcon = FuncLoader.LoadFunction<d_sdl_setwindowicon>(NativeLibrary, "SDL_SetWindowIcon");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate void d_sdl_getwindowposition(IntPtr window, out int x, out int y);
+			public static d_sdl_getwindowposition GetPosition = FuncLoader.LoadFunction<d_sdl_getwindowposition>(NativeLibrary, "SDL_GetWindowPosition");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate void d_sdl_getwindowsize(IntPtr window, out int w, out int h);
+			public static d_sdl_getwindowsize GetSize = FuncLoader.LoadFunction<d_sdl_getwindowsize>(NativeLibrary, "SDL_GetWindowSize");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate void d_sdl_setwindowbordered(IntPtr window, int bordered);
+			public static d_sdl_setwindowbordered SetBordered = FuncLoader.LoadFunction<d_sdl_setwindowbordered>(NativeLibrary, "SDL_SetWindowBordered");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate void d_sdl_setwindowposition(IntPtr window, int x, int y);
+			public static d_sdl_setwindowposition SetPosition = FuncLoader.LoadFunction<d_sdl_setwindowposition>(NativeLibrary, "SDL_SetWindowPosition");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate void d_sdl_setwindowresizable(IntPtr window, bool resizable);
+			public static d_sdl_setwindowresizable SetResizable = FuncLoader.LoadFunction<d_sdl_setwindowresizable>(NativeLibrary, "SDL_SetWindowResizable");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate void d_sdl_setwindowsize(IntPtr window, int w, int h);
+			public static d_sdl_setwindowsize SetSize = FuncLoader.LoadFunction<d_sdl_setwindowsize>(NativeLibrary, "SDL_SetWindowSize");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			private delegate void d_sdl_setwindowtitle(IntPtr window, ref byte value);
+			private static d_sdl_setwindowtitle SDL_SetWindowTitle = FuncLoader.LoadFunction<d_sdl_setwindowtitle>(NativeLibrary, "SDL_SetWindowTitle");
+			
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 			private delegate IntPtr CreateWindowFunc(string title, int x, int y, int w, int h, int flags);
 			private static readonly CreateWindowFunc CreateWindowNative = FuncLoader.LoadFunction<CreateWindowFunc>(NativeLibrary, "SDL_CreateWindow");
 
 			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 			private delegate int GetWindowDisplayIndexFunc(IntPtr window);
 			private static readonly GetWindowDisplayIndexFunc GetWindowDisplayIndex = FuncLoader.LoadFunction<GetWindowDisplayIndexFunc>(NativeLibrary, "SDL_GetWindowDisplayIndex");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			private delegate int SetWindowFullscreenDelegate(IntPtr window, int flags);
+			private static readonly SetWindowFullscreenDelegate SetWindowFullscreen = FuncLoader.LoadFunction<SetWindowFullscreenDelegate>(NativeLibrary, "SDL_SetWindowFullscreen");
 
 			#endregion
 
@@ -586,6 +641,15 @@ namespace Lunatics.Framework.DesktopGL
 			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 			public delegate void DeleteContextDelegate(IntPtr context);
 			public static DeleteContextDelegate DeleteContext = FuncLoader.LoadFunction<DeleteContextDelegate>(NativeLibrary, "SDL_GL_DeleteContext");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate void GetDrawableSizeDelegate(IntPtr context, out int w, out int h);
+			public static GetDrawableSizeDelegate GetDrawableSize = FuncLoader.LoadFunction<GetDrawableSizeDelegate>(NativeLibrary, "SDL_GL_GetDrawableSize");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate int d_sdl_gl_setswapinterval(int interval);
+			public static d_sdl_gl_setswapinterval SetSwapInterval = FuncLoader.LoadFunction<d_sdl_gl_setswapinterval>(NativeLibrary, "SDL_GL_SetSwapInterval");
+
 
 			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 			private delegate IntPtr CreateContextFunc(IntPtr window);

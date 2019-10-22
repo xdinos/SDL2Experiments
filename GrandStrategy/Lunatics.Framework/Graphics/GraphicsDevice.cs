@@ -6,9 +6,9 @@ namespace Lunatics.Framework.Graphics
 {
 	public abstract class GraphicsDevice : IDisposable
 	{
-		public GraphicsAdapter Adapter { get; }
+		public GraphicsAdapter Adapter { get; protected set; }
 
-		public PresentationParameters PresentationParameters { get; }
+		public PresentationParameters PresentationParameters { get; protected set; }
 
 		public BlendState BlendState { get; set; }
 
@@ -77,6 +77,8 @@ namespace Lunatics.Framework.Graphics
 		                                           int numVertices,
 		                                           int startIndex,
 		                                           int primitiveCount);
+
+		public abstract void Reset(PresentationParameters presentationParameters, GraphicsAdapter adapter);
 
 		public abstract void Present();
 

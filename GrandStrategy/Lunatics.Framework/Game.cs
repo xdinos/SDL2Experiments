@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Lunatics.Framework.Graphics;
+using Lunatics.Mathematics;
 
 namespace Lunatics.Framework
 {
@@ -15,13 +16,33 @@ namespace Lunatics.Framework
 
 		public GameWindow Window => Platform.Window;
 
-		public GraphicsDevice GraphicsDevice => GetOrCreateGraphicsDevice();
+		public GraphicsDevice GraphicsDevice => _graphicsDevice;
+
+		public bool IsFullScreen { get; set; }
+		public int PreferredBackBufferHeight { get; set; }
+		public int PreferredBackBufferWidth { get; set; }
+		public SurfaceFormat PreferredBackBufferFormat {get; set;}
+		public DepthFormat PreferredDepthStencilFormat { get; set; }
+		public bool SynchronizeWithVerticalRetrace { get; set; }
+		
 
 		protected Game(Func<Game, GamePlatform> platformFactory,
 		               Func<GraphicsAdapter, PresentationParameters, GraphicsDevice> graphicsDeviceFactory)
 		{
+			PreferredBackBufferWidth = PresentationParameters.DefaultBackBufferWidth;
+			PreferredBackBufferHeight = PresentationParameters.DefaultBackBufferHeight;
+			
+			PreferredBackBufferFormat = SurfaceFormat.Color;
+			PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+
+			SynchronizeWithVerticalRetrace = true;
+			// TODO: PreferMultiSampling = false;
+
 			Platform = platformFactory(this);
 			_graphicsDeviceFactory = graphicsDeviceFactory;
+
+			// TODO:...
+			// Window.ClientSizeChanged += INTERNAL_OnClientSizeChanged;
 		}
 
 		public void Run()
@@ -81,25 +102,35 @@ namespace Lunatics.Framework
 
 		private void DoInitialize()
 		{
+			if (_graphicsDevice == null)
+				CreateGraphicsDevice();
+
 			Platform.BeforeInitialize();
 			Initialize();
 		}
 
-		private GraphicsDevice GetOrCreateGraphicsDevice()
+		private void CreateGraphicsDevice()
 		{
 			if (_graphicsDevice != null)
-				return _graphicsDevice;
+				return;
 
-			var defaultAdapter = Platform.GetGraphicsAdapters().First();
+			var gdi = new GraphicsDeviceInfo
+			          {
+				          Adapter = Platform.GetGraphicsAdapters().First(),
+				          PresentationParameters = new PresentationParameters
+				                                   {
+					                                   DeviceWindowHandle = Window.Handle,
+					                                   DepthStencilFormat = PreferredDepthStencilFormat,
+					                                   IsFullScreen = false
+				                                   }
+			          };
 
 			// TODO: ??? OnPreparingDeviceSettings(this, new PreparingDeviceSettingsEventArgs(gdi));
 
-			_graphicsDevice = _graphicsDeviceFactory(defaultAdapter,
-			                                         new PresentationParameters
-			                                         {
-														 DeviceWindowHandle = Window.Handle,
-														 IsFullScreen = false
-			                                         });
+			PreferredBackBufferFormat = gdi.PresentationParameters.BackBufferFormat;
+			PreferredDepthStencilFormat = gdi.PresentationParameters.DepthStencilFormat;
+
+			_graphicsDevice = _graphicsDeviceFactory(gdi.Adapter, gdi.PresentationParameters);
 			
 			_graphicsDevice.Disposing += OnDeviceDisposing;
 			// TODO: ...
@@ -109,19 +140,59 @@ namespace Lunatics.Framework
 			ApplyChanges();
 
 			// TODO: ??? OnDeviceCreated(this, EventArgs.Empty);
-
-			return _graphicsDevice;
 		}
 
 		private void ApplyChanges()
 		{
-			if (_graphicsDevice==null) return;
+			if (_graphicsDevice == null) return;
+
+			var gdi = new GraphicsDeviceInfo
+			          {
+				          Adapter = _graphicsDevice.Adapter,
+				          PresentationParameters = _graphicsDevice.PresentationParameters.Clone()
+			          };
+
+			gdi.PresentationParameters.BackBufferFormat = PreferredBackBufferFormat;
+
+			gdi.PresentationParameters.BackBufferWidth = PreferredBackBufferWidth;
+			gdi.PresentationParameters.BackBufferHeight = PreferredBackBufferHeight;
+
+			gdi.PresentationParameters.DepthStencilFormat = PreferredDepthStencilFormat;
+			gdi.PresentationParameters.IsFullScreen = IsFullScreen;
+			gdi.PresentationParameters.PresentationInterval = SynchronizeWithVerticalRetrace
+				                                                  ? PresentInterval.One
+				                                                  : PresentInterval.Immediate;
+
+			// TODO: ??? OnPreparingDeviceSettings(this, new PreparingDeviceSettingsEventArgs(gdi));
+
+			Window.BeginScreenDeviceChange(gdi.PresentationParameters.IsFullScreen);
+			Window.EndScreenDeviceChange(gdi.Adapter.DeviceName,
+			                             gdi.PresentationParameters.BackBufferWidth,
+			                             gdi.PresentationParameters.BackBufferHeight);
+
+			// FIXME: This should be before EndScreenDeviceChange! -flibit
+			_graphicsDevice.Reset(gdi.PresentationParameters, gdi.Adapter);
 		}
 
 		private void OnDeviceDisposing(object sender, EventArgs args)
 		{
 			UnloadContent();
 		}
+
+		// TODO: ...
+		//private void INTERNAL_OnClientSizeChanged(object sender, EventArgs e)
+		//{
+		//	Rectangle size = (sender as GameWindow).ClientBounds;
+		//	resizedBackBufferWidth = size.Width;
+		//	resizedBackBufferHeight = size.Height;
+		//	if (Environment.GetEnvironmentVariable("FNA_GRAPHICS_ENABLE_HIGHDPI") == "1")
+		//	{
+		//		resizedBackBufferWidth *= 2;
+		//		resizedBackBufferHeight *= 2;
+		//	}
+		//	useResizedBackBuffer = true;
+		//	ApplyChanges();
+		//}
 
 		#region IDisposable
 

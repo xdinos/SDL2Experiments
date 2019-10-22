@@ -68,6 +68,8 @@ namespace Lunatics.Framework.DesktopGL
 			TextureBinding2D = 0x8069,
 			MaxTextureMaxAnisotropyExt = 0x84FF,
 			MaxSamples = 0x8D57,
+
+			NumExtensions = 0x821D
 		}
 
 		internal enum StringName
@@ -517,6 +519,10 @@ namespace Lunatics.Framework.DesktopGL
 		{
 			public static bool SupportsBaseVertex { get; private set; }
 
+			public static bool SupportsDxt1 { get; private set; }
+
+			public static bool SupportsS3tc { get; private set; }
+
 			#region Delegates
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
@@ -647,8 +653,18 @@ namespace Lunatics.Framework.DesktopGL
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			private delegate IntPtr GetStringDelegate(StringName param);
-
 			private static GetStringDelegate GetStringInternal;
+
+			[System.Security.SuppressUnmanagedCodeSecurity()]
+			private delegate IntPtr GetStringIDelegate(StringName param, uint index);
+			private static GetStringIDelegate GetStringIInternal;
+			private static string GetStringI(StringName param, uint index)
+			{
+				unsafe
+				{
+					return new string((sbyte*)GetStringIInternal(param, index));
+				}
+			}
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			internal delegate void GenRenderbuffersDelegate(int count, [Out] out int buffer);
@@ -1042,37 +1058,76 @@ namespace Lunatics.Framework.DesktopGL
             }
 
 #if DEBUG
+
+			private enum DebugSource
+			{
+				GL_DEBUG_SOURCE_API = 0x8246,
+				GL_DEBUG_SOURCE_WINDOW_SYSTEM = 0x8247,
+				GL_DEBUG_SOURCE_SHADER_COMPILER = 0x8248,
+				GL_DEBUG_SOURCE_THIRD_PARTY = 0x8249,
+				GL_DEBUG_SOURCE_APPLICATION = 0x824A,
+				GL_DEBUG_SOURCE_OTHER = 0x824B,
+			}
+
+			private enum DebugType
+			{
+				GL_DEBUG_TYPE_ERROR = 0x824C,
+				GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR = 0x824D,
+				GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR = 0x824E,
+				GL_DEBUG_TYPE_PORTABILITY = 0x824F,
+				GL_DEBUG_TYPE_PERFORMANCE = 0x8250,
+				GL_DEBUG_TYPE_OTHER = 0x8251,
+			}
+
+			private enum DebugSeverity
+			{
+				GL_DEBUG_SEVERITY_HIGH = 0x9146,
+				GL_DEBUG_SEVERITY_MEDIUM = 0x9147,
+				GL_DEBUG_SEVERITY_LOW = 0x9148,
+				GL_DEBUG_SEVERITY_NOTIFICATION = 0x826B
+			}
+
 			[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-			delegate void DebugMessageCallbackProc(int source,
-			                                       int type,
+			delegate void DebugMessageCallbackProc(DebugSource source,
+			                                       DebugType type,
 			                                       int id,
-			                                       int severity,
+			                                       DebugSeverity severity,
 			                                       int length,
 			                                       IntPtr message,
 			                                       IntPtr userParam);
-
-			static DebugMessageCallbackProc DebugProc;
+			private static DebugMessageCallbackProc DebugProc;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			delegate void DebugMessageCallbackDelegate(DebugMessageCallbackProc callback, IntPtr userParam);
-
 			static DebugMessageCallbackDelegate DebugMessageCallback;
 
-			internal delegate void ErrorDelegate(string message);
+			[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+			private delegate void DebugMessageControlDelegate(DebugSource source,
+			                                                  DebugType type,
+			                                                  DebugSeverity severity,
+			                                                  int count,
+			                                                  IntPtr ids, // const GLuint*
+			                                                  bool enabled);
+			private static DebugMessageControlDelegate DebugMessageControl;
 
+			internal delegate void ErrorDelegate(string message);
 			internal static event ErrorDelegate OnError;
 
-			static void DebugMessageCallbackHandler(int source,
-			                                        int type,
+			static void DebugMessageCallbackHandler(DebugSource source,
+			                                        DebugType type,
 			                                        int id,
-			                                        int severity,
+			                                        DebugSeverity severity,
 			                                        int length,
 			                                        IntPtr message,
 			                                        IntPtr userParam)
 			{
-				var errorMessage = Marshal.PtrToStringAnsi(message);
+				var errorMessage = $"{Marshal.PtrToStringAnsi(message)}\n\tSource: {source}\n\tType: {type}\n\tSeverity: {severity}";
 				System.Diagnostics.Debug.WriteLine(errorMessage);
 				OnError?.Invoke(errorMessage);
+
+				if (type == DebugType.GL_DEBUG_TYPE_ERROR)
+					throw new InvalidOperationException(errorMessage);
+
 			}
 #endif
 
@@ -1374,33 +1429,58 @@ namespace Lunatics.Framework.DesktopGL
 					}
 				}
 
+                if (useCoreProfile)
+                {
+					GenVertexArrays = LoadFunction<GenVertexArraysDelegate>("glGenVertexArrays");
+					DeleteVertexArrays = LoadFunction<DeleteVertexArraysDelegate>("glDeleteVertexArrays");
+					BindVertexArray = LoadFunction<BindVertexArrayDelegate>("glBindVertexArray");
+					GetStringIInternal = LoadFunction<GetStringIDelegate>("glGetStringi"); 
+				}
+
+                LoadExtensions(useCoreProfile);
+
+                SupportsS3tc = Extensions.Contains("GL_EXT_texture_compression_s3tc") ||
+                               Extensions.Contains("GL_OES_texture_compression_S3TC") ||
+                               Extensions.Contains("GL_EXT_texture_compression_dxt3") ||
+                               Extensions.Contains("GL_EXT_texture_compression_dxt5");
+                SupportsDxt1 = SupportsS3tc ||
+                               Extensions.Contains("GL_EXT_texture_compression_dxt1");
+
 #if DEBUG
-				try
-				{
-					DebugMessageCallback = LoadFunction<DebugMessageCallbackDelegate>("glDebugMessageCallback");
-					if (DebugMessageCallback != null)
+                try
+                {
+	                // Try KHR_debug first...
+	                var debugMessageControlPtr = Sdl.GL.GetProcAddress("glDebugMessageControl");
+					var debugMessageCallbackPtr = Sdl.GL.GetProcAddress("glDebugMessageCallback");
+
+					if (debugMessageControlPtr == IntPtr.Zero || 
+					    debugMessageCallbackPtr == IntPtr.Zero)
 					{
-						DebugProc = DebugMessageCallbackHandler;
-						DebugMessageCallback(DebugProc, IntPtr.Zero);
-						Enable(EnableCap.DebugOutput);
-						Enable(EnableCap.DebugOutputSynchronous);
+						/* ... then try ARB_debug_output. */
+						debugMessageControlPtr = Sdl.GL.GetProcAddress("glDebugMessageControlARB");
+						debugMessageCallbackPtr = Sdl.GL.GetProcAddress("glDebugMessageCallbackARB");
 					}
-				}
-				catch (EntryPointNotFoundException)
-				{
-					// Ignore the debug message callback if the entry point can not be found
-				}
+
+					if (debugMessageControlPtr != IntPtr.Zero && debugMessageCallbackPtr != IntPtr.Zero)
+					{
+						DebugMessageControl= Marshal.GetDelegateForFunctionPointer<DebugMessageControlDelegate>(debugMessageControlPtr);
+						DebugMessageCallback = Marshal.GetDelegateForFunctionPointer<DebugMessageCallbackDelegate>(debugMessageCallbackPtr);
+
+
+						if (DebugMessageCallback != null)
+						{
+							DebugProc = DebugMessageCallbackHandler;
+							DebugMessageCallback(DebugProc, IntPtr.Zero);
+							Enable(EnableCap.DebugOutput);
+							Enable(EnableCap.DebugOutputSynchronous);
+						}
+					}
+                }
+                catch (EntryPointNotFoundException)
+                {
+	                // Ignore the debug message callback if the entry point can not be found
+                }
 #endif
-                if (!useCoreProfile)
-                {
-                    LoadExtensions();
-                }
-                else
-                {
-                    GenVertexArrays = LoadFunction<GenVertexArraysDelegate>("glGenVertexArrays");
-                    DeleteVertexArrays = LoadFunction<DeleteVertexArraysDelegate>("glDeleteVertexArrays");
-                    BindVertexArray = LoadFunction<BindVertexArrayDelegate>("glBindVertexArray");
-                }
 			}
 
 			private static T LoadFunction<T>(string function, bool throwIfNotFound = false)
@@ -1418,12 +1498,22 @@ namespace Lunatics.Framework.DesktopGL
 				return Marshal.GetDelegateForFunctionPointer<T>(ret);
 			}
 
-			private static void LoadExtensions()
+			private static void LoadExtensions(bool useCoreProfile)
 			{
-				var extensionsString = GL.GetString(StringName.Extensions);
-				var error = GetError();
-				if (!string.IsNullOrEmpty(extensionsString) && error == ErrorCode.NoError)
-					Extensions.AddRange(extensionsString.Split(' '));
+				if (!useCoreProfile)
+				{
+					var extensionsString = GL.GetString(StringName.Extensions);
+					var error = GetError();
+					if (!string.IsNullOrEmpty(extensionsString) && error == ErrorCode.NoError)
+						Extensions.AddRange(extensionsString.Split(' '));
+				}
+				else
+				{
+					GetInteger(GetPName.NumExtensions, out var numExtensions);
+					for (uint i = 0; i < numExtensions; i++)
+						Extensions.Add(GetStringI(StringName.Extensions,i));
+				}
+				
 
 				if (GL.GenRenderbuffers == null && Extensions.Contains("GL_EXT_framebuffer_object"))
 				{
@@ -1475,8 +1565,7 @@ namespace Lunatics.Framework.DesktopGL
 
 				if (GL.BlendEquationSeparatei == null && Extensions.Contains("GL_ARB_draw_buffers_blend"))
 				{
-					GL.BlendEquationSeparatei =
-						LoadFunction<GL.BlendEquationSeparateiDelegate>("BlendEquationSeparateiARB");
+					GL.BlendEquationSeparatei = LoadFunction<GL.BlendEquationSeparateiDelegate>("BlendEquationSeparateiARB");
 				}
 			}
 

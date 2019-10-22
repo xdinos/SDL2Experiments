@@ -143,11 +143,12 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 		/// </summary>
 		public void Clear()
 		{
-			// TODO: ...
-			//foreach (var pair in _programCache)
-			//{
-			//	_graphicsDevice.DisposeProgram(pair.Value.Program);
-			//}
+			foreach (var pair in _programCache)
+			{
+				OpenGL.GL.DeleteProgram(pair.Value.Program);
+				// TODO: ... ???
+				//_graphicsDevice.DisposeProgram(pair.Value.Program);
+			}
 			_programCache.Clear();
 		}
 

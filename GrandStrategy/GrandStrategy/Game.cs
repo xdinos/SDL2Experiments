@@ -13,7 +13,8 @@ namespace GrandStrategy
 			: base(g => new Lunatics.Framework.DesktopGL.SdlPlatform(g),
 			       (adapter, presentationParameters) => new OpenGLGraphicsDevice(adapter, presentationParameters))
 		{
-
+			PreferredBackBufferWidth = 1280;
+			PreferredBackBufferHeight = 720;
 		}
 
 		protected override void Initialize()
@@ -131,7 +132,7 @@ void main() {
 			_vertexShader.SetMatrix4("MVP", ref spritePrj);
 			_spriteBatch.Begin();
 			_spriteBatch.Draw(_mapTexture,
-							  new Vector2(400,300), 
+							  new Vector2(vp.Width/2f,vp.Height/2f), 
 							  null,
 							  Color.White,
 							  0,

@@ -28,18 +28,7 @@ namespace Lunatics.Framework.DesktopGL
 			Window = CreateWindow();
 		}
 
-		public override IReadOnlyCollection<GraphicsAdapter> GetGraphicsAdapters()
-		{
-			var adapters = new GraphicsAdapter[Sdl.Display.GetNumVideoDisplays()];
-			for (var i = 0; i < adapters.Length; i += 1)
-			{
-				adapters[i] = new Graphics.GraphicsAdapter(i,
-				                                           $@"\\.\DISPLAY{i + 1}",
-				                                           Sdl.Display.GetDisplayName(i));
-			}
-
-			return adapters;
-		}
+		public override IReadOnlyCollection<GraphicsAdapter> GetGraphicsAdapters() => Adapters;
 
 		protected override void RunLoop()
 		{
@@ -84,35 +73,49 @@ namespace Lunatics.Framework.DesktopGL
 			Sdl.GL.SetAttribute(Sdl.GL.Attribute.DepthSize, 24/*depthSize*/);
 			Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 8/*stencilSize*/);
 			Sdl.GL.SetAttribute(Sdl.GL.Attribute.DoubleBuffer, 1);
-
-            // TODO: ???
-            if (Environment.GetEnvironmentVariable("OPENGL_FORCE_CORE_PROFILE") == "1")
+			
+			if (Environment.GetEnvironmentVariable("OPENGL_FORCE_CORE_PROFILE") == "1")
             {
                 Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextProfileMask, (int)Sdl.GL.ContextProfile.Core);
-                Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 3);
-                Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 3);
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 4);
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 1);
             }
 
-            var contextFlags = Sdl.GL.Context.ForwardCompatible;
 #if DEBUG
-            contextFlags |= Sdl.GL.Context.Debug;
-            //Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, (int)Sdl.GL.Context.Debug);
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, (int)Sdl.GL.Context.Debug);
 #endif
-            Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, (int)contextFlags);
             initFlags |= Sdl.Window.Flags.OpenGL;
+
+            if (Environment.GetEnvironmentVariable("GRAPHICS_ENABLE_HIGHDPI") == "1")
+	            initFlags |= Sdl.Window.Flags.AllowHighDPI;
 
 			var handle = Sdl.Window.Create(GetDefaultWindowTitle(), 
 			                               Sdl.Window.PosCentered,
 			                               Sdl.Window.PosCentered,
-			                               800/*GraphicsDeviceManager.DefaultBackBufferWidth*/,
-			                               600/*GraphicsDeviceManager.DefaultBackBufferHeight*/,
+			                               PresentationParameters.DefaultBackBufferWidth/*GraphicsDeviceManager.DefaultBackBufferWidth*/,
+			                               PresentationParameters.DefaultBackBufferHeight/*GraphicsDeviceManager.DefaultBackBufferHeight*/,
 			                               initFlags);
 			if (handle == IntPtr.Zero)
-			{
 				throw new Exception/*NoSuitableGraphicsDeviceException*/(Sdl.GetError());
-			}
+
 			
 			Sdl.DisableScreenSaver();
+
+			Sdl.GL.GetDrawableSize(handle, out var drawX, out var drawY);
+
+			if (drawX == PresentationParameters.DefaultBackBufferWidth/*GraphicsDeviceManager.DefaultBackBufferWidth*/ &&
+			    drawY == PresentationParameters.DefaultBackBufferHeight/*GraphicsDeviceManager.DefaultBackBufferHeight*/)
+			{
+				Environment.SetEnvironmentVariable("GRAPHICS_ENABLE_HIGHDPI", "0");
+			}
+			else
+			{
+
+				// Store the full retina resolution of the display
+				// TODO ...
+				//RetinaWidth = drawX;
+				//RetinaHeight = drawY;
+			}
 
 			return new SdlWindow(handle, $@"\\.\DISPLAY{Sdl.Window.GetDisplayIndex(handle) + 1}");
 		}
@@ -164,5 +167,22 @@ namespace Lunatics.Framework.DesktopGL
 
 		private int _displayIndex;
 		private bool _isExiting = false;
+
+		internal static ReadOnlyCollection<GraphicsAdapter> Adapters => _adapters ?? (_adapters = new ReadOnlyCollection<GraphicsAdapter>(GetGraphicsAdaptersImpl()));
+
+		private static GraphicsAdapter[] GetGraphicsAdaptersImpl()
+		{
+			var adapters = new GraphicsAdapter[Sdl.Display.GetNumVideoDisplays()];
+			for (var i = 0; i < adapters.Length; i += 1)
+			{
+				adapters[i] = new Graphics.GraphicsAdapter(i,
+				                                           $@"\\.\DISPLAY{i + 1}",
+				                                           Sdl.Display.GetDisplayName(i));
+			}
+
+			return adapters;
+		}
+
+		private static ReadOnlyCollection<GraphicsAdapter> _adapters;
 	}
 }

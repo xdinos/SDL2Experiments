@@ -34,7 +34,7 @@ namespace Lunatics.Framework
 					Deactivated?.Invoke(this, EventArgs.Empty);
 			}
 		}
-
+		
 		public abstract IReadOnlyCollection<GraphicsAdapter> GetGraphicsAdapters();
 
 		protected GamePlatform(Game game)

@@ -5,6 +5,8 @@ namespace Lunatics.Framework
 	public abstract class GameWindow : IDisposable
 	{
 		public abstract IntPtr Handle { get; }
+		public abstract void BeginScreenDeviceChange(bool willBeFullScreen);
+		public abstract void EndScreenDeviceChange(string deviceName, int clientWidth, int clientHeight);
 
 		#region IDisposable
 

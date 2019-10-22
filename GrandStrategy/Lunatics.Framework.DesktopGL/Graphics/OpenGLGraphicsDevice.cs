@@ -51,15 +51,34 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 			string version = OpenGL.GL.GetString(OpenGL.StringName.Version);
 			string vendor = OpenGL.GL.GetString(OpenGL.StringName.Vendor);
 			string shadingLanguageVersion = OpenGL.GL.GetString(OpenGL.StringName.ShadingLanguageVersion);
-			//var extensions = OpenGL.GL.GetString(OpenGL.StringName.Extensions);
 
 			BlendState = BlendState.Opaque;
 			DepthStencilState = DepthStencilState.Default;
 			RasterizerState = RasterizerState.CullCounterClockwise;
 
-			BackBuffer = new NullBackBuffer(presentationParameters.BackBufferWidth,
-			                                presentationParameters.BackBufferHeight,
-			                                _windowDepthFormat);
+			// Initialize the faux-backbuffer
+			//if (UseFauxBackbuffer(presentationParameters, adapter.CurrentDisplayMode))
+			//{
+			//	if (!supportsFauxBackbuffer)
+			//	{
+			//		throw new NoSuitableGraphicsDeviceException(
+			//			"Your hardware does not support the faux-backbuffer!" +
+			//			"\n\nKeep the window/backbuffer resolution the same."
+			//		);
+			//	}
+			//	BackBuffer = new OpenGLBackbuffer(this,
+			//	                                  presentationParameters.BackBufferWidth,
+			//	                                  presentationParameters.BackBufferHeight,
+			//	                                  presentationParameters.DepthStencilFormat,
+			//	                                  presentationParameters.MultiSampleCount);
+			//}
+			//else
+			{
+				BackBuffer = new NullBackBuffer(presentationParameters.BackBufferWidth,
+				                                presentationParameters.BackBufferHeight,
+				                                _windowDepthFormat);
+			}
+			
 
 			OpenGL.GL.GetInteger(OpenGL.GetPName.MaxTextureImageUnits, out var numSamplers);
 
@@ -120,15 +139,18 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 
 			_programCache = new ShaderProgramCache(this);
 
-            if (_useCoreProfile)
+			// TODO: ???
+			//OpenGL.GL.GenFramebuffers(1, out targetFramebuffer);
+			//OpenGL.GL.GenFramebuffers(1, out resolveFramebufferRead);
+			//OpenGL.GL.GenFramebuffers(1, out resolveFramebufferDraw);
+
+			if (_useCoreProfile)
             {
-                OpenGL.GL.GenVertexArrays(1, out _vao);
-                OpenGL.GL.BindVertexArray(_vao);
+                OpenGL.GL.GenVertexArrays(1, out _vertexArrayObject);
+                OpenGL.GL.BindVertexArray(_vertexArrayObject);
             }
 		}
 
-        private bool _useCoreProfile = false;
-        private uint _vao;
 		
 		public override void SetVertexBuffer(VertexBuffer vertexBuffer, int vertexOffset)
 		{
@@ -380,6 +402,59 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 			                      startIndex, 
 			                      primitiveCount,
 			                      Indices);
+		}
+
+		public override void Reset(PresentationParameters presentationParameters, Framework.Graphics.GraphicsAdapter adapter)
+		{
+			PresentationParameters = presentationParameters ?? throw new ArgumentNullException(nameof(presentationParameters));
+			Adapter = adapter;
+
+			// TODO:..
+			// Verify MSAA before we really start...
+			// PresentationParameters.MultiSampleCount = Math.Min(MathHelper.ClosestMSAAPower(PresentationParameters.MultiSampleCount), GLDevice.MaxMultiSampleCount);
+
+			// We're about to reset, let the application know.
+			// TODO: if (DeviceResetting != null) DeviceResetting(this, EventArgs.Empty);
+
+			/* FIXME: Why are we not doing this...? -flibit
+			lock (resourcesLock)
+			{
+				foreach (WeakReference resource in resources)
+				{
+					object target = resource.Target;
+					if (target != null)
+					{
+						(target as GraphicsResource).GraphicsDeviceResetting();
+					}
+				}
+
+				// Remove references to resources that have been garbage collected.
+				resources.RemoveAll(wr => !wr.IsAlive);
+			}
+			*/
+
+			/* Reset the backbuffer first, before doing anything else.
+			 * The GLDevice needs to know what we're up to right away.
+			 * -flibit
+			 */
+			ResetBackbuffer(PresentationParameters, Adapter);
+
+			// TODO: ...
+			// The mouse needs to know this for faux-backbuffer mouse scaling.
+			//Input.Mouse.INTERNAL_BackBufferWidth = PresentationParameters.BackBufferWidth;
+			//Input.Mouse.INTERNAL_BackBufferHeight = PresentationParameters.BackBufferHeight;
+			
+			// Now, update the viewport
+			Viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+
+			// Update the scissor rectangle to our new default target size
+			// TODO: ScissorRectangle = new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+			
+			// Finally, update the swap interval
+			SetPresentationInterval(PresentationParameters.PresentationInterval);
+
+			// We just reset, let the application know.
+			// TODO: if (DeviceReset != null) DeviceReset(this, EventArgs.Empty);
 		}
 
 		public override void Present()
@@ -652,18 +727,32 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 				OpenGL.GL.DepthRange((double) depthRangeMin, (double) depthRangeMax);
 			}
 		}
-
-		private float depthRangeMin = 0.0f;
-		private float depthRangeMax = 1.0f;
-		private Rectangle viewport = new Rectangle(0, 0, 0, 0);
-
-
+		
 		protected override void Dispose(bool disposing)
 		{
 			if (IsDisposed) return;
 
 			if (disposing)
 			{
+				if (_useCoreProfile)
+				{
+					OpenGL.GL.BindVertexArray(0);
+					OpenGL.GL.DeleteVertexArrays(1, ref _vertexArrayObject);
+				}
+
+
+				// TODO: ???
+				//OpenGL.GL.DeleteFramebuffers(1, ref resolveFramebufferRead);
+				//resolveFramebufferRead = 0;
+				//OpenGL.GL.DeleteFramebuffers(1, ref resolveFramebufferDraw);
+				//resolveFramebufferDraw = 0;
+				//OpenGL.GL.DeleteFramebuffers(1, ref targetFramebuffer);
+				//targetFramebuffer = 0;
+
+				// TODO: (BackBuffer as OpenGLBackBuffer)?.Dispose();
+
+				_programCache.Dispose();
+
 				Sdl.GL.DeleteContext(_glContext);
 			}
 
@@ -1292,6 +1381,91 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 			}
 		}
 
+		private void SetPresentationInterval(PresentInterval interval)
+		{
+			if (interval == PresentInterval.Default || interval == PresentInterval.One)
+			{
+				var OSVersion = Sdl.GetPlatform();
+				var disableLateSwapTear = OSVersion.Equals("Mac OS X") ||
+				                          OSVersion.Equals("WinRT") ||
+				                          Environment.GetEnvironmentVariable("FNA_OPENGL_DISABLE_LATESWAPTEAR") == "1";
+				if (disableLateSwapTear)
+				{
+					Sdl.GL.SetSwapInterval(1);
+				}
+				else
+				{
+					if (Sdl.GL.SetSwapInterval(-1) != -1)
+					{
+						//FNALoggerEXT.LogInfo("Using EXT_swap_control_tear VSync!");
+						System.Diagnostics.Debug.WriteLine("Using EXT_swap_control_tear VSync!");
+					}
+					else
+					{
+						System.Diagnostics.Debug.WriteLine("EXT_swap_control_tear unsupported. Fall back to standard VSync.");
+						Sdl.ClearError();
+						Sdl.GL.SetSwapInterval(1);
+					}
+				}
+			}
+			else if (interval == PresentInterval.Immediate)
+			{
+				Sdl.GL.SetSwapInterval(0);
+			}
+			else if (interval == PresentInterval.Two)
+			{
+				Sdl.GL.SetSwapInterval(2);
+			}
+			else
+			{
+				throw new NotSupportedException("Unrecognized PresentInterval!");
+			}
+		}
+
+		private void ResetBackbuffer(PresentationParameters presentationParameters, Framework.Graphics.GraphicsAdapter adapter)
+		{
+			//if (UseFauxBackbuffer(presentationParameters, adapter.CurrentDisplayMode))
+			//{
+			//	if (Backbuffer is NullBackbuffer)
+			//	{
+			//		if (!supportsFauxBackbuffer)
+			//		{
+			//			throw new NoSuitableGraphicsDeviceException(
+			//				"Your hardware does not support the faux-backbuffer!" +
+			//				"\n\nKeep the window/backbuffer resolution the same."
+			//			);
+			//		}
+			//		Backbuffer = new OpenGLBackbuffer(
+			//			this,
+			//			presentationParameters.BackBufferWidth,
+			//			presentationParameters.BackBufferHeight,
+			//			presentationParameters.DepthStencilFormat,
+			//			presentationParameters.MultiSampleCount
+			//		);
+			//	}
+			//	else
+			//	{
+			//		Backbuffer.ResetFramebuffer(
+			//			presentationParameters
+			//		);
+			//	}
+			//}
+			//else
+			{
+				//if (BackBuffer is OpenGLBackBuffer)
+				//{
+				//	(BackBuffer as OpenGLBackBuffer).Dispose();
+				//	BackBuffer = new NullBackBuffer(presentationParameters.BackBufferWidth,
+				//	                                presentationParameters.BackBufferHeight, 
+				//	                                _windowDepthFormat);
+				//}
+				//else
+				{
+					BackBuffer.Reset(presentationParameters);
+				}
+			}
+		}
+
 		internal unsafe void ActivateShaderProgram()
 		{
 			// Lookup the shader program.
@@ -1424,6 +1598,14 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 		private int _currentIndexBuffer = 0;
 		private int _currentVertexBufferHandle = 0;
 
+
+		private float depthRangeMin = 0.0f;
+		private float depthRangeMax = 1.0f;
+		private Rectangle viewport = new Rectangle(0, 0, 0, 0);
+
+		private uint _vertexArrayObject;
+		private readonly bool _useCoreProfile;
+
 		private OpenGLTexture[] _textures;
 
 		private class VertexAttribute
@@ -1454,16 +1636,18 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 		private int vertexBufferCount = 0;
 		private bool vertexBuffersUpdated = false;
 
-		private ShaderProgramCache _programCache;
+		
 		private ShaderProgram _shaderProgram = null;
 
 		private readonly uint[] currentAttachments;
 		private readonly bool[] modifiedSamplers = new bool[MaxTextureSamplers];
 		private readonly bool[] modifiedVertexSamplers = new bool[MaxVertexTextureSamplers];
 
-		private const int MaxTextureSamplers = 16;
+		private readonly ShaderProgramCache _programCache;
+
 		internal const int MaxVertexAttributes = 16;
 		internal const int MaxRenderTargetBindings = 4;
+		private const int MaxTextureSamplers = 16;
 		private const int MaxVertexTextureSamplers = 4;
 
 		#endregion
