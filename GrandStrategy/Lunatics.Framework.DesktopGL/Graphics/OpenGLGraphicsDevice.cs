@@ -1661,18 +1661,15 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 				OpenGL.PixelFormat.Rgb, // GLenum.GL_RGB, // SurfaceFormat.Bgr565
 				OpenGL.PixelFormat.Bgra, // GLenum.GL_BGRA, // SurfaceFormat.Bgra5551
 				OpenGL.PixelFormat.Bgra, // GLenum.GL_BGRA, // SurfaceFormat.Bgra4444
-				OpenGL.PixelFormat
-				      .CompressedTextureFormats, // GLenum.GL_COMPRESSED_TEXTURE_FORMATS, // SurfaceFormat.Dxt1
-				OpenGL.PixelFormat
-				      .CompressedTextureFormats, // GLenum.GL_COMPRESSED_TEXTURE_FORMATS, // SurfaceFormat.Dxt3
-				OpenGL.PixelFormat
-				      .CompressedTextureFormats, // GLenum.GL_COMPRESSED_TEXTURE_FORMATS, // SurfaceFormat.Dxt5
+				OpenGL.PixelFormat.CompressedTextureFormats, // GLenum.GL_COMPRESSED_TEXTURE_FORMATS, // SurfaceFormat.Dxt1
+				OpenGL.PixelFormat.CompressedTextureFormats, // GLenum.GL_COMPRESSED_TEXTURE_FORMATS, // SurfaceFormat.Dxt3
+				OpenGL.PixelFormat.CompressedTextureFormats, // GLenum.GL_COMPRESSED_TEXTURE_FORMATS, // SurfaceFormat.Dxt5
 				OpenGL.PixelFormat.Rg, // GLenum.GL_RG, // SurfaceFormat.NormalizedByte2
 				OpenGL.PixelFormat.Rgba, // GLenum.GL_RGBA, // SurfaceFormat.NormalizedByte4
 				OpenGL.PixelFormat.Rgba, // GLenum.GL_RGBA, // SurfaceFormat.Rgba1010102
 				OpenGL.PixelFormat.Rg, // GLenum.GL_RG, // SurfaceFormat.Rg32
 				OpenGL.PixelFormat.Rgba, // GLenum.GL_RGBA, // SurfaceFormat.Rgba64
-				OpenGL.PixelFormat.Luminance, // GLenum.GL_LUMINANCE, // SurfaceFormat.Alpha8
+				OpenGL.PixelFormat.Alpha, // GLenum.GL_ALPHA, // SurfaceFormat.Alpha8
 				OpenGL.PixelFormat.Red, // GLenum.GL_RED, // SurfaceFormat.Single
 				OpenGL.PixelFormat.Rg, // GLenum.GL_RG, // SurfaceFormat.Vector2
 				OpenGL.PixelFormat.Rgba, // GLenum.GL_RGBA, // SurfaceFormat.Vector4
@@ -1690,18 +1687,15 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 				OpenGL.PixelInternalFormat.Rgb8, // GLenum.GL_RGB8, // SurfaceFormat.Bgr565
 				OpenGL.PixelInternalFormat.Rgb5A1, // GLenum.GL_RGB5_A1, // SurfaceFormat.Bgra5551
 				OpenGL.PixelInternalFormat.Rgba4, // GLenum.GL_RGBA4, // SurfaceFormat.Bgra4444
-				OpenGL.PixelInternalFormat
-				      .CompressedRgbS3tcDxt1Ext, // GLenum.GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, // SurfaceFormat.Dxt1
-				OpenGL.PixelInternalFormat
-				      .CompressedRgbaS3tcDxt3Ext, // GLenum.GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, // SurfaceFormat.Dxt3
-				OpenGL.PixelInternalFormat
-				      .CompressedRgbaS3tcDxt5Ext, // GLenum.GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, // SurfaceFormat.Dxt5
+				OpenGL.PixelInternalFormat.CompressedRgbS3tcDxt1Ext, // GLenum.GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, // SurfaceFormat.Dxt1
+				OpenGL.PixelInternalFormat.CompressedRgbaS3tcDxt3Ext, // GLenum.GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, // SurfaceFormat.Dxt3
+				OpenGL.PixelInternalFormat.CompressedRgbaS3tcDxt5Ext, // GLenum.GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, // SurfaceFormat.Dxt5
 				OpenGL.PixelInternalFormat.Rg8, // GLenum.GL_RG8, // SurfaceFormat.NormalizedByte2
 				OpenGL.PixelInternalFormat.Rgba8, // GLenum.GL_RGBA8, // SurfaceFormat.NormalizedByte4
 				OpenGL.PixelInternalFormat.Rgb10A2Ext, // GLenum.GL_RGB10_A2_EXT, // SurfaceFormat.Rgba1010102
 				OpenGL.PixelInternalFormat.Rg16, // GLenum.GL_RG16, // SurfaceFormat.Rg32
 				OpenGL.PixelInternalFormat.Rgba16, // GLenum.GL_RGBA16, // SurfaceFormat.Rgba64
-				OpenGL.PixelInternalFormat.Luminance, // GLenum.GL_LUMINANCE, // SurfaceFormat.Alpha8
+				OpenGL.PixelInternalFormat.Alpha, // GLenum.GL_LUMINANCE, // SurfaceFormat.Alpha8
 				OpenGL.PixelInternalFormat.R32f, // GLenum.GL_R32F, // SurfaceFormat.Single
 				OpenGL.PixelInternalFormat.Rgba32f, // GLenum.GL_RG32F, // SurfaceFormat.Vector2
 				OpenGL.PixelInternalFormat.Rgba32f, // GLenum.GL_RGBA32F, // SurfaceFormat.Vector4
@@ -1724,8 +1718,7 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 				(OpenGL.PixelType) 0x0000, // GLenum.GL_ZERO, // NOPE
 				OpenGL.PixelType.Byte, // GLenum.GL_BYTE, // SurfaceFormat.NormalizedByte2
 				OpenGL.PixelType.Byte, // GLenum.GL_BYTE, // SurfaceFormat.NormalizedByte4
-				OpenGL.PixelType
-				      .UnsignedInt1010102, // GLenum.GL_UNSIGNED_INT_2_10_10_10_REV, // SurfaceFormat.Rgba1010102
+				OpenGL.PixelType.UnsignedInt1010102, // GLenum.GL_UNSIGNED_INT_2_10_10_10_REV, // SurfaceFormat.Rgba1010102
 				OpenGL.PixelType.UnsignedShort, // GLenum.GL_UNSIGNED_SHORT, // SurfaceFormat.Rg32
 				OpenGL.PixelType.UnsignedShort, // GLenum.GL_UNSIGNED_SHORT, // SurfaceFormat.Rgba64
 				OpenGL.PixelType.UnsignedByte, // GLenum.GL_UNSIGNED_BYTE, // SurfaceFormat.Alpha8
@@ -1764,24 +1757,15 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 		private static readonly int[] MinMipFilter
 			=
 			{
-				(int) OpenGL.TextureMinFilter
-				            .LinearMipmapLinear, // GLenum.GL_LINEAR_MIPMAP_LINEAR, // TextureFilter.Linear
-				(int) OpenGL.TextureMinFilter
-				            .NearestMipmapNearest, // GLenum.GL_NEAREST_MIPMAP_NEAREST, // TextureFilter.Point
-				(int) OpenGL.TextureMinFilter
-				            .LinearMipmapLinear, // GLenum.GL_LINEAR_MIPMAP_LINEAR, // TextureFilter.Anisotropic
-				(int) OpenGL.TextureMinFilter
-				            .LinearMipmapNearest, // GLenum.GL_LINEAR_MIPMAP_NEAREST, // TextureFilter.LinearMipPoint
-				(int) OpenGL.TextureMinFilter
-				            .NearestMipmapLinear, // GLenum.GL_NEAREST_MIPMAP_LINEAR, // TextureFilter.PointMipLinear
-				(int) OpenGL.TextureMinFilter
-				            .LinearMipmapLinear, // GLenum.GL_LINEAR_MIPMAP_LINEAR, // TextureFilter.MinLinearMagPointMipLinear
-				(int) OpenGL.TextureMinFilter
-				            .LinearMipmapNearest, // GLenum.GL_LINEAR_MIPMAP_NEAREST, // TextureFilter.MinLinearMagPointMipPoint
-				(int) OpenGL.TextureMinFilter
-				            .NearestMipmapLinear, // GLenum.GL_NEAREST_MIPMAP_LINEAR, // TextureFilter.MinPointMagLinearMipLinear
-				(int) OpenGL.TextureMinFilter
-				            .NearestMipmapNearest, // GLenum.GL_NEAREST_MIPMAP_NEAREST // TextureFilter.MinPointMagLinearMipPoint
+				(int) OpenGL.TextureMinFilter.LinearMipmapLinear, // GLenum.GL_LINEAR_MIPMAP_LINEAR, // TextureFilter.Linear
+				(int) OpenGL.TextureMinFilter.NearestMipmapNearest, // GLenum.GL_NEAREST_MIPMAP_NEAREST, // TextureFilter.Point
+				(int) OpenGL.TextureMinFilter.LinearMipmapLinear, // GLenum.GL_LINEAR_MIPMAP_LINEAR, // TextureFilter.Anisotropic
+				(int) OpenGL.TextureMinFilter.LinearMipmapNearest, // GLenum.GL_LINEAR_MIPMAP_NEAREST, // TextureFilter.LinearMipPoint
+				(int) OpenGL.TextureMinFilter.NearestMipmapLinear, // GLenum.GL_NEAREST_MIPMAP_LINEAR, // TextureFilter.PointMipLinear
+				(int) OpenGL.TextureMinFilter.LinearMipmapLinear, // GLenum.GL_LINEAR_MIPMAP_LINEAR, // TextureFilter.MinLinearMagPointMipLinear
+				(int) OpenGL.TextureMinFilter.LinearMipmapNearest, // GLenum.GL_LINEAR_MIPMAP_NEAREST, // TextureFilter.MinLinearMagPointMipPoint
+				(int) OpenGL.TextureMinFilter.NearestMipmapLinear, // GLenum.GL_NEAREST_MIPMAP_LINEAR, // TextureFilter.MinPointMagLinearMipLinear
+				(int) OpenGL.TextureMinFilter.NearestMipmapNearest, // GLenum.GL_NEAREST_MIPMAP_NEAREST // TextureFilter.MinPointMagLinearMipPoint
 			};
 
 		private static readonly int[] MinFilter
@@ -1839,8 +1823,7 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 			{
 				OpenGL.BlendEquationMode.FuncAdd, // GLenum.GL_FUNC_ADD, BlendFunction.Add
 				OpenGL.BlendEquationMode.FuncSubtract, // GLenum.GL_FUNC_SUBTRACT, BlendFunction.Subtract
-				OpenGL.BlendEquationMode
-				      .FuncReverseSubtract, // GLenum.GL_FUNC_REVERSE_SUBTRACT, BlendFunction.ReverseSubtract
+				OpenGL.BlendEquationMode.FuncReverseSubtract, // GLenum.GL_FUNC_REVERSE_SUBTRACT, BlendFunction.ReverseSubtract
 				OpenGL.BlendEquationMode.Max, // GLenum.GL_MAX, BlendFunction.Max
 				OpenGL.BlendEquationMode.Min // GLenum.GL_MIN, BlendFunction.Min
 			};
