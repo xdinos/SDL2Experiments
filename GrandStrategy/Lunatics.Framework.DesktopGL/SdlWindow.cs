@@ -1,4 +1,5 @@
 ﻿using System;
+using Lunatics.Framework.Input;
 
 namespace Lunatics.Framework.DesktopGL
 {
@@ -36,6 +37,11 @@ namespace Lunatics.Framework.DesktopGL
 		{
 			if (disposing)
 			{
+				// TODO: Sdl.SetHintWithPriority(SDL.SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0", SDL.SDL_HintPriority.SDL_HINT_OVERRIDE);
+
+				if (Mouse.WindowHandle == Handle)
+					Mouse.WindowHandle = IntPtr.Zero;
+
 				if (Handle != IntPtr.Zero)
 				{
 					Sdl.Window.Destroy(Handle);

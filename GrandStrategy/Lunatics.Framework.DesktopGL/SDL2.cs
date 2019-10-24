@@ -101,14 +101,15 @@ namespace Lunatics.Framework.DesktopGL
 			public Keyboard.Event Key;
 			[FieldOffset(0)]
 			public Mouse.MotionEvent Motion;
+			[FieldOffset(0)]
+			public Mouse.ButtonEvent Button;
+			[FieldOffset(0)]
+			public Mouse.WheelEvent Wheel;
 			// TODO: ...
 			//[FieldOffset(0)]
 			//public Keyboard.TextEditingEvent Edit;
-			// TODO: ...
 			//[FieldOffset(0)]
 			//public Keyboard.TextInputEvent Text;
-			[FieldOffset(0)]
-			public Mouse.WheelEvent Wheel;
 			//[FieldOffset(0)]
 			//public Joystick.DeviceEvent JoystickDevice;
 			//[FieldOffset(0)]
@@ -341,6 +342,24 @@ namespace Lunatics.Framework.DesktopGL
 				Close,
 			}
 
+			public static class State
+			{
+				public const int Fullscreen = 0x00000001;
+				public const int OpenGL = 0x00000002;
+				public const int Shown = 0x00000004;
+				public const int Hidden = 0x00000008;
+				public const int Borderless = 0x00000010;
+				public const int Resizable = 0x00000020;
+				public const int Minimized = 0x00000040;
+				public const int Maximized = 0x00000080;
+				public const int Grabbed = 0x00000100;
+				public const int InputFocus = 0x00000200;
+				public const int MouseFocus = 0x00000400;
+				public const int FullscreenDesktop = 0x00001001;
+				public const int Foreign = 0x00000800;
+				public const int AllowHighDPI = 0x00002000;
+				public const int MouseCapture = 0x00004000;
+			}
 
 			[StructLayout(LayoutKind.Sequential)]
 			public struct Event
@@ -507,6 +526,21 @@ namespace Lunatics.Framework.DesktopGL
 			}
 
 			[StructLayout(LayoutKind.Sequential)]
+			public struct ButtonEvent
+			{
+				public EventType Type;
+				public uint Timestamp;
+				public uint WindowID;
+				public uint Which;
+				public byte Button; /* button id */
+				public byte State; /* SDL_PRESSED or SDL_RELEASED */
+				public byte Clicks; /* 1 for single-click, 2 for double-click, etc. */
+				private byte Padding1;
+				public int x;
+				public int y;
+			}
+
+			[StructLayout(LayoutKind.Sequential)]
 			public struct WheelEvent
 			{
 				public EventType Type;
@@ -517,6 +551,23 @@ namespace Lunatics.Framework.DesktopGL
 				public int Y;
 				public uint Direction;
 			}
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate Button d_sdl_getglobalmousestate(out int x, out int y);
+			public static d_sdl_getglobalmousestate GetGlobalState = FuncLoader.LoadFunction<d_sdl_getglobalmousestate>(NativeLibrary, "SDL_GetGlobalMouseState");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate Button d_sdl_getmousestate(out int x, out int y);
+			public static d_sdl_getmousestate GetState = FuncLoader.LoadFunction<d_sdl_getmousestate>(NativeLibrary, "SDL_GetMouseState");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate int GetRelativeMouseModeDelegate();
+			public static GetRelativeMouseModeDelegate GetRelativeMode = FuncLoader.LoadFunction<GetRelativeMouseModeDelegate>(NativeLibrary, "SDL_GetRelativeMouseMode");
+
+			[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+			public delegate Button GetRelativeMouseStateDelegate(out int x, out int y);
+			public static GetRelativeMouseStateDelegate GetRelativeState = FuncLoader.LoadFunction<GetRelativeMouseStateDelegate>(NativeLibrary, "SDL_GetRelativeMouseState");
+
 		}
 
 		public static class Keyboard

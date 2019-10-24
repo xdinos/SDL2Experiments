@@ -25,6 +25,12 @@
     <None Update="assets\map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="assets\Shaders\PixelShader_OpenGL.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\Shaders\VertexShader_OpenGL.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="assets\tex.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

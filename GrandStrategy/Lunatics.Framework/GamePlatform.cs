@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using Lunatics.Framework.Graphics;
+using Lunatics.Framework.Input;
 
 namespace Lunatics.Framework
 {
@@ -17,7 +18,7 @@ namespace Lunatics.Framework
 
 		public Game Game { get; }
 
-		public GameWindow Window { get; protected set; }
+		//public GameWindow Window { get; protected set; }
 		
 		public bool IsActive
 		{
@@ -42,14 +43,20 @@ namespace Lunatics.Framework
 			Game = game;
 		}
 
+		protected internal abstract List<Keys> GetKeys();
+
 		protected internal virtual void BeforeInitialize()
 		{
 			IsActive = true;
 		}
 
+		protected internal abstract GameWindow CreateWindow();
+
 		protected internal abstract void RunLoop();
 
 		protected internal abstract void Present();
+
+		protected internal abstract MouseState GetMouseState(IntPtr windowHandle);
 
 		public static string GetDefaultWindowTitle()
 		{

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Lunatics.Framework.Graphics;
+using Lunatics.Framework.Input;
 using Lunatics.Mathematics;
 
 namespace Lunatics.Framework
@@ -14,7 +15,8 @@ namespace Lunatics.Framework
 
 		internal GamePlatform Platform { get; }
 
-		public GameWindow Window => Platform.Window;
+		//public GameWindow Window => Platform.Window;
+		public GameWindow Window { get; }
 
 		public GraphicsDevice GraphicsDevice => _graphicsDevice;
 
@@ -39,8 +41,14 @@ namespace Lunatics.Framework
 			// TODO: PreferMultiSampling = false;
 
 			Platform = platformFactory(this);
+			Window = Platform.CreateWindow();
 			_graphicsDeviceFactory = graphicsDeviceFactory;
 
+			Mouse.Initialize(Platform);
+			Mouse.WindowHandle = Window.Handle;
+			
+			Keyboard.SetKeys(Platform.GetKeys());
+			
 			// TODO:...
 			// Window.ClientSizeChanged += INTERNAL_OnClientSizeChanged;
 		}
@@ -217,6 +225,7 @@ namespace Lunatics.Framework
 			if (disposing)
 			{
 				Platform?.Dispose();
+				Window?.Dispose();
 				GraphicsDevice?.Dispose();
 			}
 

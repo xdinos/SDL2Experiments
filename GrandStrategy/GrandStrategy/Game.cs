@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using Lunatics.Framework;
 using Lunatics.Framework.DesktopGL.Graphics;
 using Lunatics.Framework.Graphics;
+using Lunatics.Framework.Input;
 using Lunatics.Mathematics;
 
 namespace GrandStrategy
@@ -19,6 +21,9 @@ namespace GrandStrategy
 
 		protected override void Initialize()
 		{
+			var vp = GraphicsDevice.Viewport;
+			_position = new Vector2(vp.Width / 2f, vp.Height / 2f);
+
 			base.Initialize();
 		}
 
@@ -26,35 +31,7 @@ namespace GrandStrategy
         {
             base.Dispose(disposing);
         }
-
-        private readonly string VertexShaderCode =
-			@"#version 330 core 
-layout(location = 0) in vec3 vertexPosition_modelspace;
-layout(location = 1) in vec4 vertexColor;
-layout(location = 2) in vec2 vertexUV;
-uniform mat4 MVP;
-out vec4 fragmentColor;
-out vec2 UV;
-void main() {
-	//gl_Position.xyz = vertexPosition_modelspace;
-	//gl_Position.w = 1.0;
-	gl_Position =  MVP * vec4(vertexPosition_modelspace, 1);
-	fragmentColor = vertexColor;
-	UV = vertexUV;
-}";
-
-		private readonly string PixelShaderCode =
-			@"#version 330 core
-uniform sampler2D myTextureSampler;
-in vec4 fragmentColor;
-in vec2 UV;
-out vec4 color;
-void main() {
-	//color = vec3(0,1,0);
-	//color = fragmentColor;
-	color = texture( myTextureSampler, UV );
-}";
-
+		
 		protected override void LoadContent()
 		{
 			base.LoadContent();
@@ -63,8 +40,8 @@ void main() {
 			//_mapTexture = Texture2D.Load(GraphicsDevice, "assets/tex.png");
 			_spriteBatch = new SpriteBatch(GraphicsDevice);
 
-			_vertexShader = GraphicsDevice.CreateVertexShader(VertexShaderCode);
-			_pixelShader = GraphicsDevice.CreatePixelShader(PixelShaderCode);
+			_vertexShader = GraphicsDevice.CreateVertexShader(File.ReadAllText("assets/Shaders/VertexShader_OpenGL.txt"));
+			_pixelShader = GraphicsDevice.CreatePixelShader(File.ReadAllText("assets/Shaders/PixelShader_OpenGL.txt"));
 
 			_vertexBuffer = GraphicsDevice.CreateVertexBuffer(VertexPositionColorTexture.VertexDeclaration, 6, BufferUsage.None, false);
 			_vertexBuffer.SetData(_bufferData1);
@@ -93,6 +70,18 @@ void main() {
 
 		protected override void Update(TimeSpan elapsedGameTime)
 		{
+			var ms = Mouse.GetState();
+			var ks = Keyboard.GetState();
+
+			if (ks.IsKeyDown(Keys.A))
+				_position.X += 10;
+			if (ks.IsKeyDown(Keys.D))
+				_position.X -= 10;
+			if (ks.IsKeyDown(Keys.W))
+				_position.Y += 10;
+			if (ks.IsKeyDown(Keys.S))
+				_position.Y -= 10;
+
 			base.Update(elapsedGameTime);
 		}
 
@@ -132,7 +121,7 @@ void main() {
 			_vertexShader.SetMatrix4("MVP", ref spritePrj);
 			_spriteBatch.Begin();
 			_spriteBatch.Draw(_mapTexture,
-							  new Vector2(vp.Width/2f,vp.Height/2f), 
+							  _position, 
 							  null,
 							  Color.White,
 							  0,
@@ -155,6 +144,7 @@ void main() {
 			base.EndDraw();
 		}
 
+		private Vector2 _position;
 
 		private Shader _pixelShader;
 		private Shader _vertexShader;
@@ -162,6 +152,7 @@ void main() {
 		private SpriteBatch _spriteBatch;
 		
 		private VertexBuffer _vertexBuffer;
+		
 		private Matrix _globalTransformation = Matrix.Identity;
 
 		private VertexPositionColorTexture[] _bufferData1 =
