@@ -6,6 +6,7 @@ using System.Linq;
 using Lunatics.Framework.DesktopGL.Input;
 using Lunatics.Framework.Graphics;
 using Lunatics.Framework.Input;
+using Lunatics.SDLGL;
 
 namespace Lunatics.Framework.DesktopGL
 {
@@ -28,7 +29,7 @@ namespace Lunatics.Framework.DesktopGL
 			Sdl.Init(Sdl.InitFlags.Video);
 		}
 
-		public override IReadOnlyCollection<GraphicsAdapter> GetGraphicsAdapters() => Adapters;
+		public override IReadOnlyList<GraphicsAdapter> GetGraphicsAdapters() => Adapters;
 
 		protected override List<Keys> GetKeys()
 		{

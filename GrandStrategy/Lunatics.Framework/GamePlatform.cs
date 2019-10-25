@@ -36,7 +36,7 @@ namespace Lunatics.Framework
 			}
 		}
 		
-		public abstract IReadOnlyCollection<GraphicsAdapter> GetGraphicsAdapters();
+		public abstract IReadOnlyList<GraphicsAdapter> GetGraphicsAdapters();
 
 		protected GamePlatform(Game game)
 		{

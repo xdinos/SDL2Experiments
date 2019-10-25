@@ -19,6 +19,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Lunatics.Framework.DesktopGL\Lunatics.Framework.DesktopGL.csproj" />
     <ProjectReference Include="..\Lunatics.Framework\Lunatics.Framework.csproj" />
+    <ProjectReference Include="..\SharpCEGui\SharpCEGui.Base\SharpCEGui.Base.csproj" />
+    <ProjectReference Include="..\SharpCEGui\SharpCEGui.CoreWindowRendererSet\SharpCEGui.CoreWindowRendererSet.csproj" />
+    <ProjectReference Include="..\SharpCEGui\SharpCEGui.OpenGLRenderer\SharpCEGui.OpenGLRenderer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

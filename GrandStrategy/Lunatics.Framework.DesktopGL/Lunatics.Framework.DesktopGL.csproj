@@ -23,27 +23,29 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="x64\SDL2.dll" />
-    <None Remove="x86\SDL2.dll" />
+    <Compile Remove="Utilities\**" />
+    <Compile Remove="x64\**" />
+    <Compile Remove="x86\**" />
+    <EmbeddedResource Remove="Utilities\**" />
+    <EmbeddedResource Remove="x64\**" />
+    <EmbeddedResource Remove="x86\**" />
+    <None Remove="Utilities\**" />
+    <None Remove="x64\**" />
+    <None Remove="x86\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="x64\SDL2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="x86\SDL2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Compile Remove="OpenGL.cs" />
+    <Compile Remove="SDL2.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="libSDL2-2.0.0.dylib" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Lunatics.Framework\Lunatics.Framework.csproj" />
     <ProjectReference Include="..\Lunatics.Mathematics\Lunatics.Mathematics.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="libSDL2-2.0.0.dylib">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\Lunatics.SDLGL\Lunatics.SDLGL.csproj" />
   </ItemGroup>
 </Project>

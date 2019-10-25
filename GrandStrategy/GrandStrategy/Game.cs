@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Lunatics.Framework;
-using Lunatics.Framework.DesktopGL.Graphics;
 using Lunatics.Framework.Graphics;
 using Lunatics.Framework.Input;
 using Lunatics.Mathematics;
@@ -11,9 +10,9 @@ namespace GrandStrategy
 
 	public class Game : Lunatics.Framework.Game
 	{
-		public Game()
-			: base(g => new Lunatics.Framework.DesktopGL.SdlPlatform(g),
-			       (adapter, presentationParameters) => new OpenGLGraphicsDevice(adapter, presentationParameters))
+		public Game(Func<Lunatics.Framework.Game, GamePlatform> platformFactory,
+		            Func<GraphicsAdapter, PresentationParameters, GraphicsDevice> graphicsDeviceFactory)
+			: base(platformFactory, graphicsDeviceFactory)
 		{
 			PreferredBackBufferWidth = 1280;
 			PreferredBackBufferHeight = 720;
@@ -45,6 +44,39 @@ namespace GrandStrategy
 
 			_vertexBuffer = GraphicsDevice.CreateVertexBuffer(VertexPositionColorTexture.VertexDeclaration, 6, BufferUsage.None, false);
 			_vertexBuffer.SetData(_bufferData1);
+
+			_renderer = SharpCEGui.OpenGLRenderer.OpenGL3Renderer.Create();
+			//new SharpCEGuiNLogger();
+			var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), GameName);
+			var file = Path.Combine(path, "CEGUISharp.log");
+			_system = SharpCEGui.Base.System.Create(_renderer,
+													null/*new PackedResourceProvider(Path.Combine(GetCurrentDirectory(),"resources.pack"))*/,
+													new SharpCEGui.Base.DefaultXmlParser(),
+													null,
+													String.Empty,
+													file);
+
+			//var scheme = String.Empty;
+			//var prefix = "00-";
+
+			//InitializeScheme(ref scheme, ref prefix);
+			//InitialiseDefaultResourceGroups();
+			//InitialiseResourceGroupDirectories();
+
+#if WINDOWS
+            _system.GetClipboard().SetNativeProvider(new WindowsClipboardProvider());
+#elif __MACOS__
+            _system.GetClipboard().SetNativeProvider(new MacOSClipboardProvider());
+#endif
+
+			_guiContext = _system.GetDefaultGUIContext();
+			_guiContext.GetCursor().SetVisible(false);
+			_inputAggregator = new SharpCEGui.Base.InputAggregator(_guiContext);
+			_inputAggregator.Initialise();
+
+			// TODO: ?? Window.TextInput += (sender, args) => _inputAggregator.InjectChar(args.Character);
+
+			// TODO: _viewManager = new ViewManager(this, scheme, prefix);
 		}
 
 		protected override void UnloadContent()
@@ -152,7 +184,14 @@ namespace GrandStrategy
 		private SpriteBatch _spriteBatch;
 		
 		private VertexBuffer _vertexBuffer;
-		
+
+		private SharpCEGui.Base.System _system;
+		private SharpCEGui.Base.Renderer _renderer;
+		private SharpCEGui.Base.GUIContext _guiContext;
+		private SharpCEGui.Base.InputAggregator _inputAggregator;
+
+		public const string GameName = "WBMX";
+
 		private Matrix _globalTransformation = Matrix.Identity;
 
 		private VertexPositionColorTexture[] _bufferData1 =

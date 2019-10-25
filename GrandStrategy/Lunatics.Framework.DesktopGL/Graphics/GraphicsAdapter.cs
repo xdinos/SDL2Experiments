@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lunatics.Framework.Graphics;
+using Lunatics.SDLGL;
 
 namespace Lunatics.Framework.DesktopGL.Graphics
 {
-	public sealed class GraphicsAdapter : Framework.Graphics.GraphicsAdapter
+	internal sealed class GraphicsAdapter : Framework.Graphics.GraphicsAdapter
 	{
 		public override DisplayMode CurrentDisplayMode
 		{

@@ -1,4 +1,5 @@
 ﻿using System;
+using Lunatics.SDLGL;
 
 namespace Lunatics.Framework.DesktopGL.Graphics
 {

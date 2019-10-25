@@ -1,5 +1,6 @@
 ﻿using System;
 using Lunatics.Framework.Input;
+using Lunatics.SDLGL;
 
 namespace Lunatics.Framework.DesktopGL
 {

@@ -7,7 +7,7 @@ using Lunatics.Utilities;
 
 namespace Lunatics.Framework.DesktopGL
 {
-	internal static class Sdl
+	public static class Sdl
 	{
 		[Flags]
 		public enum InitFlags : int

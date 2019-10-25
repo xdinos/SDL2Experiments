@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="MathematicsExtensions.cs" />
+    <Compile Remove="OpenGL1Texture.cs" />
+    <Compile Remove="OpenGLFBOTextureTarget.cs" />
+    <Compile Remove="OpenGLGeometryBuffer.cs" />
+    <Compile Remove="OpenGLRenderer.cs" />
+    <Compile Remove="OpenGLWGLPBTextureTarget.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StbImageSharp" Version="2.22.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lunatics.SDLGL\Lunatics.SDLGL.csproj" />
+    <ProjectReference Include="..\SharpCEGui.Base\SharpCEGui.Base.csproj" />
+  </ItemGroup>
+
+</Project>

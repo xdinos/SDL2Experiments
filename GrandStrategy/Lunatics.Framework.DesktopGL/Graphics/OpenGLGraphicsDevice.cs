@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using Lunatics.Framework.Graphics;
 using Lunatics.Mathematics;
+using Lunatics.SDLGL;
 
 namespace Lunatics.Framework.DesktopGL.Graphics
 {
@@ -1603,7 +1604,7 @@ namespace Lunatics.Framework.DesktopGL.Graphics
 		private float depthRangeMax = 1.0f;
 		private Rectangle viewport = new Rectangle(0, 0, 0, 0);
 
-		private uint _vertexArrayObject;
+		private int _vertexArrayObject;
 		private readonly bool _useCoreProfile;
 
 		private OpenGLTexture[] _textures;

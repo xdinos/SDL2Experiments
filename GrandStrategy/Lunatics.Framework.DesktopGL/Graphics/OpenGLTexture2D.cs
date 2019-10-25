@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using Lunatics.Framework.Graphics;
 using Lunatics.Mathematics;
+using Lunatics.SDLGL;
 
 namespace Lunatics.Framework.DesktopGL.Graphics
 {

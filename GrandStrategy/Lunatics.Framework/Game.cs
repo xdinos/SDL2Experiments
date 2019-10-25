@@ -13,7 +13,7 @@ namespace Lunatics.Framework
 		
 		#endregion
 
-		internal GamePlatform Platform { get; }
+		public/*internal*/ GamePlatform Platform { get; }
 
 		//public GameWindow Window => Platform.Window;
 		public GameWindow Window { get; }
