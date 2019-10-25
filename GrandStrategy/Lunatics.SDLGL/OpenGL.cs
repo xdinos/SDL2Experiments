@@ -80,12 +80,17 @@ namespace Lunatics.SDLGL
 			TextureBinding2D = 0x8069,
 			MaxTextureMaxAnisotropyExt = 0x84FF,
 			MaxSamples = 0x8D57,
-			
-			Viewport= 0x0BA2,
+
+			NumExtensions = 0x821D,
+
+			Viewport = 0x0BA2,
 			PackAlignment = 0x0D05,
 			UnpackAlignment = 0x0CF5,
 
-			NumExtensions = 0x821D
+			GL_COLOR_CLEAR_VALUE = 0x0C22,
+			GL_FRAMEBUFFER_BINDING = 0x8CA6,
+			GL_DRAW_FRAMEBUFFER_BINDING = 0x8CA6,
+			GL_READ_FRAMEBUFFER_BINDING = 0x8CAA,
 		}
 
 		public enum StringName
@@ -371,7 +376,7 @@ namespace Lunatics.SDLGL
 			ElementArrayBuffer = 0x8893,
 		}
 
-		internal enum FramebufferErrorCode
+		public enum FramebufferErrorCode
 		{
 			FramebufferUndefined = 0x8219,
 			FramebufferComplete = 0x8CD5,
@@ -404,6 +409,7 @@ namespace Lunatics.SDLGL
 			Framebuffer = 0x8D40,
 			FramebufferExt = 0x8D40,
 			ReadFramebuffer = 0x8CA8,
+			DrawFrameBuffer =0x8CA9
 		}
 
 		public enum RenderbufferStorage
@@ -696,14 +702,12 @@ namespace Lunatics.SDLGL
 			}
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate void GenRenderbuffersDelegate(int count, [Out] out int buffer);
-
-			internal static GenRenderbuffersDelegate GenRenderbuffers;
+			public delegate void GenRenderbuffersDelegate(int count, [Out] out int buffer);
+			public static GenRenderbuffersDelegate GenRenderbuffers;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate void BindRenderbufferDelegate(RenderbufferTarget target, int buffer);
-
-			internal static BindRenderbufferDelegate BindRenderbuffer;
+			public delegate void BindRenderbufferDelegate(RenderbufferTarget target, int buffer);
+			public static BindRenderbufferDelegate BindRenderbuffer;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			internal delegate void DeleteRenderbuffersDelegate(int count, [In] [Out] ref int buffer);
@@ -719,19 +723,16 @@ namespace Lunatics.SDLGL
 			internal static RenderbufferStorageMultisampleDelegate RenderbufferStorageMultisample;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate void GenFramebuffersDelegate(int count, out int buffer);
-
-			internal static GenFramebuffersDelegate GenFramebuffers;
-
-			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate void BindFramebufferDelegate(FramebufferTarget target, int buffer);
-
-			internal static BindFramebufferDelegate BindFramebuffer;
+			public delegate void GenFramebuffersDelegate(int count, out int buffer);
+			public static GenFramebuffersDelegate GenFrameBuffers;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate void DeleteFramebuffersDelegate(int count, ref int buffer);
+			public delegate void BindFramebufferDelegate(FramebufferTarget target, int buffer);
+			public static BindFramebufferDelegate BindFramebuffer;
 
-			internal static DeleteFramebuffersDelegate DeleteFramebuffers;
+			[System.Security.SuppressUnmanagedCodeSecurity()]
+			public delegate void DeleteFrameBuffersDelegate(int count, ref int buffer);
+			public static DeleteFrameBuffersDelegate DeleteFrameBuffers;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			public delegate void InvalidateFramebufferDelegate(FramebufferTarget target,
@@ -741,12 +742,12 @@ namespace Lunatics.SDLGL
 			public static InvalidateFramebufferDelegate InvalidateFramebuffer;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate void FramebufferTexture2DDelegate(FramebufferTarget target,
-			                                                    FramebufferAttachment attachment,
-			                                                    TextureTarget textureTarget,
-			                                                    int texture,
-			                                                    int level);
-			internal static FramebufferTexture2DDelegate FramebufferTexture2D;
+			public delegate void FramebufferTexture2DDelegate(FramebufferTarget target,
+			                                                  FramebufferAttachment attachment,
+			                                                  TextureTarget textureTarget,
+			                                                  int texture,
+			                                                  int level);
+			public static FramebufferTexture2DDelegate FramebufferTexture2D;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			internal delegate void FramebufferTexture2DMultiSampleDelegate(FramebufferTarget target,
@@ -759,12 +760,12 @@ namespace Lunatics.SDLGL
 			internal static FramebufferTexture2DMultiSampleDelegate FramebufferTexture2DMultiSample;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate void FramebufferRenderbufferDelegate(FramebufferTarget target,
+			public delegate void FramebufferRenderbufferDelegate(FramebufferTarget target,
 			                                                       FramebufferAttachment attachment,
 			                                                       RenderbufferTarget renderBufferTarget,
 			                                                       int buffer);
 
-			internal static FramebufferRenderbufferDelegate FramebufferRenderbuffer;
+			public static FramebufferRenderbufferDelegate FramebufferRenderbuffer;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			public delegate void RenderbufferStorageDelegate(RenderbufferTarget target,
@@ -800,8 +801,8 @@ namespace Lunatics.SDLGL
 			internal static BlitFramebufferDelegate BlitFramebuffer;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate FramebufferErrorCode CheckFramebufferStatusDelegate(FramebufferTarget target);
-			internal static CheckFramebufferStatusDelegate CheckFramebufferStatus;
+			public delegate FramebufferErrorCode CheckFramebufferStatusDelegate(FramebufferTarget target);
+			public static CheckFramebufferStatusDelegate CheckFramebufferStatus;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			public delegate void ActiveTextureDelegate(TextureUnit textureUnit);
@@ -1246,6 +1247,14 @@ namespace Lunatics.SDLGL
 				}
 			}
 
+			public static unsafe void GetFloat(GetPName name, float[] value)
+			{
+				fixed (float* ptr = &value[0])
+				{
+					GetFloatv((int)name, ptr);
+				}
+			}
+
 			public static void DepthRange(double min, double max)
 			{
 				//if (BoundApi == RenderApi.ES)
@@ -1424,9 +1433,9 @@ namespace Lunatics.SDLGL
 				GenRenderbuffers = LoadFunction<GenRenderbuffersDelegate>("glGenRenderbuffers");
 				BindRenderbuffer = LoadFunction<BindRenderbufferDelegate>("glBindRenderbuffer");
 				DeleteRenderbuffers = LoadFunction<DeleteRenderbuffersDelegate>("glDeleteRenderbuffers");
-				GenFramebuffers = LoadFunction<GenFramebuffersDelegate>("glGenFramebuffers");
+				GenFrameBuffers = LoadFunction<GenFramebuffersDelegate>("glGenFramebuffers");
 				BindFramebuffer = LoadFunction<BindFramebufferDelegate>("glBindFramebuffer");
-				DeleteFramebuffers = LoadFunction<DeleteFramebuffersDelegate>("glDeleteFramebuffers");
+				DeleteFrameBuffers = LoadFunction<DeleteFrameBuffersDelegate>("glDeleteFramebuffers");
 				FramebufferTexture2D = LoadFunction<FramebufferTexture2DDelegate>("glFramebufferTexture2D");
 				FramebufferRenderbuffer = LoadFunction<FramebufferRenderbufferDelegate>("glFramebufferRenderbuffer");
 				RenderbufferStorage = LoadFunction<RenderbufferStorageDelegate>("glRenderbufferStorage");
@@ -1673,9 +1682,9 @@ namespace Lunatics.SDLGL
 				GenRenderbuffers = LoadFunction<GenRenderbuffersDelegate>("glGenRenderbuffersEXT");
 				BindRenderbuffer = LoadFunction<BindRenderbufferDelegate>("glBindRenderbufferEXT");
 				DeleteRenderbuffers = LoadFunction<DeleteRenderbuffersDelegate>("glDeleteRenderbuffersEXT");
-				GenFramebuffers = LoadFunction<GenFramebuffersDelegate>("glGenFramebuffersEXT");
+				GenFrameBuffers = LoadFunction<GenFramebuffersDelegate>("glGenFramebuffersEXT");
 				BindFramebuffer = LoadFunction<BindFramebufferDelegate>("glBindFramebufferEXT");
-				DeleteFramebuffers = LoadFunction<DeleteFramebuffersDelegate>("glDeleteFramebuffersEXT");
+				DeleteFrameBuffers = LoadFunction<DeleteFrameBuffersDelegate>("glDeleteFramebuffersEXT");
 				FramebufferTexture2D = LoadFunction<FramebufferTexture2DDelegate>("glFramebufferTexture2DEXT");
 				FramebufferRenderbuffer = LoadFunction<FramebufferRenderbufferDelegate>("glFramebufferRenderbufferEXT");
 				RenderbufferStorage = LoadFunction<RenderbufferStorageDelegate>("glRenderbufferStorageEXT");
