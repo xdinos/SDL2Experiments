@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Lunatics.SDLGL;
 using SharpCEGui.Base;
 
@@ -13,8 +14,21 @@ namespace SharpCEGui.OpenGLRenderer
 {
 	//! ~OpenGL3FBOTextureTarget - allows rendering to an OpenGL texture via FBO.
 
+
+
 	/// <summary>
-	/// Renderer class to interface with OpenGL
+	/// Renderer class to interface with desktop OpenGL version >= 3.2 or OpenGL ES version >= 2.
+	/// 
+	/// Note: to use this renderer with OpenGL ES 2.0, the Epoxy OpenGL loading
+	/// library (https://github.com/yaronct/libepoxy, major version 1)
+	/// must first be installed, and CEGUI must be configured with
+	/// "-DCEGUI_BUILD_RENDERER_OPENGL=OFF -DCEGUI_BUILD_RENDERER_OPENGL3=ON
+	/// -DCEGUI_USE_EPOXY= ON - DCEGUI_USE_GLEW = OFF".
+	///
+	/// Note: Your OpenGL context must already be initialised when you call this;
+	/// CEGUI will not create the OpenGL context itself. Nothing special has to be
+	/// done to choose between desktop OpenGL and OpenGL ES: the type is
+	/// automatically determined by the type of the current OpenGL context.
 	/// </summary>
 	public class OpenGL3Renderer : OpenGLRendererBase
     {
@@ -168,19 +182,33 @@ namespace SharpCEGui.OpenGLRenderer
             return d_openGLStateChanger;
         }
 
-        public override void BeginRendering()
+        public override bool IsS3TCSupported()
         {
-            // if enabled, restores a subset of the GL state back to default values.
-            if (d_initExtraStates)
-                SetupExtraStates();
+	        throw new NotImplementedException();
+        }
+
+		public override void BeginRendering()
+        {
+	        // Deprecated OpenGL 2 client states may mess up rendering. They are not added here
+	        // since they are deprecated and thus do not fit in a OpenGL Core renderer. However
+	        // this information may be relevant for people combining deprecated and modern
+	        // functions. In that case disable client states like this: glDisableClientState(GL_VERTEX_ARRAY);
+
+			//// if enabled, restores a subset of the GL state back to default values.
+			//if (d_initExtraStates)
+   //             SetupExtraStates();
 
             d_openGLStateChanger.Reset();
 
-            // Setup initial states
-            d_openGLStateChanger.Enable(OpenGL.EnableCap.Blend);
+			// if enabled, restores a subset of the GL state back to default values.
+			if (d_isStateResettingEnabled)
+				RestoreChangedStatesToDefaults(false);
 
-            // force set blending ops to get to a known state.
-            SetupRenderingBlendMode(BlendMode.Normal, true);
+			d_openGLStateChanger.Enable(OpenGL.EnableCap.ScissorTest);
+			d_openGLStateChanger.Enable(OpenGL.EnableCap.Blend);
+
+			// force set blending ops to get to a known state.
+			SetupRenderingBlendMode(BlendMode.Normal, true);
         }
 
         public override void EndRendering()
@@ -191,11 +219,6 @@ namespace SharpCEGui.OpenGLRenderer
         public override Sizef GetAdjustedTextureSize(Sizef sz)
         {
             return sz;
-        }
-
-        public override bool IsS3TCSupported()
-        {
-            throw new NotImplementedException();
         }
 
         public override void SetupRenderingBlendMode(BlendMode mode, bool force = false)
@@ -212,15 +235,33 @@ namespace SharpCEGui.OpenGLRenderer
             }
             else
             {
-                d_openGLStateChanger.BlendFuncSeparate(OpenGL.BlendingFactorSrc.SrcAlpha, OpenGL.BlendingFactorDest.OneMinusSrcAlpha,
-                                                       OpenGL.BlendingFactorSrc.OneMinusDstAlpha, OpenGL.BlendingFactorDest.One);
+	            d_openGLStateChanger.BlendFuncSeparate(OpenGL.BlendingFactorSrc.SrcAlpha,
+	                                                   OpenGL.BlendingFactorDest.OneMinusSrcAlpha,
+	                                                   OpenGL.BlendingFactorSrc.OneMinusDstAlpha,
+	                                                   OpenGL.BlendingFactorDest.One);
             }
         }
 
         public override RenderMaterial CreateRenderMaterial(DefaultShaderType shaderType)
         {
-            throw new NotImplementedException();
+	        if (shaderType == DefaultShaderType.Textured)
+	            return new RenderMaterial(d_shaderWrapperTextured);
+
+	        if (shaderType == DefaultShaderType.Solid)
+	            return new RenderMaterial(d_shaderWrapperSolid);
+
+	        throw new System.Exception /*RendererException*/("A default shader of this type does not exist.");
         }
+
+        public override void UploadBuffers(RenderingSurface surface)
+        {
+			throw new NotImplementedException();
+		}
+
+        public override void UploadBuffers(IEnumerable<GeometryBuffer> buffers)
+        {
+			throw new NotImplementedException();
+		}
 
         protected override OpenGLGeometryBufferBase CreateGeometryBufferImpl(RenderMaterial renderMaterial)
         {
@@ -229,11 +270,15 @@ namespace SharpCEGui.OpenGLRenderer
 
         protected override ITextureTarget CreateTextureTargetImpl(bool addStencilBuffer)
         {
-            throw new NotImplementedException();
-            //return d_textureTargetFactory.Create(this);
+			return d_textureTargetFactory(this, addStencilBuffer);
         }
 
-        protected override OpenGLTexture CreateTextureImpl(string name)
+		/// <summary>
+		/// creates a texture of GL3Texture type
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		protected override OpenGLTexture CreateTextureImpl(string name)
         {
             throw new NotImplementedException();
         }
@@ -282,7 +327,7 @@ namespace SharpCEGui.OpenGLRenderer
         /// </summary>
         protected void InitialiseOpenGLShaders()
         {
-            // TODO: checkGLErrors();
+            CheckGLErrors();
             d_shaderManager = new OpenGLBaseShaderManager(d_openGLStateChanger, ShaderVersion.Glsl);
             d_shaderManager.InitialiseShaders();
 
@@ -293,20 +338,46 @@ namespace SharpCEGui.OpenGLRenderer
         //! Initialises the OpenGL ShaderWrapper for textured objects
         protected void InitialiseStandardTexturedShaderWrapper()
         {
-            throw new NotImplementedException();
-        }
+	        var shaderStandardTextured = d_shaderManager.GetShader(OpenGLBaseShaderID.StandardTextured);
+	        d_shaderWrapperTextured = new OpenGLBaseShaderWrapper(shaderStandardTextured, d_openGLStateChanger);
+
+	        d_shaderWrapperTextured.AddTextureUniformVariable("texture0", 0);
+
+	        d_shaderWrapperTextured.AddUniformVariable("modelViewProjMatrix");
+	        d_shaderWrapperTextured.AddUniformVariable("alphaFactor");
+
+	        d_shaderWrapperTextured.AddAttributeVariable("inPosition");
+	        d_shaderWrapperTextured.AddAttributeVariable("inTexCoord");
+	        d_shaderWrapperTextured.AddAttributeVariable("inColour");
+		}
 
         //! Initialises the OpenGL ShaderWrapper for coloured objects
         protected void InitialiseStandardColouredShaderWrapper()
         {
-            throw new NotImplementedException();
+	        var shader_standard_solid = d_shaderManager.GetShader(OpenGLBaseShaderID.StandardSolid);
+	        d_shaderWrapperSolid = new OpenGLBaseShaderWrapper(shader_standard_solid, d_openGLStateChanger);
+
+	        d_shaderWrapperSolid.AddUniformVariable("modelViewProjMatrix");
+	        d_shaderWrapperSolid.AddUniformVariable("alphaFactor");
+
+	        d_shaderWrapperSolid.AddAttributeVariable("inPosition");
+	        d_shaderWrapperSolid.AddAttributeVariable("inColour");
         }
 
         /*!
         \brief
             Destructor for OpenGL3Renderer objects
         */
-        // TODO: virtual ~OpenGL3Renderer();
+        // TODO:
+  //      virtual ~OpenGL3Renderer()
+  //      {
+	 //       delete d_textureTargetFactory;
+	 //       delete d_openGLStateChanger;
+	 //       delete d_shaderManager;
+
+	 //       delete d_shaderWrapperTextured;
+	 //       delete d_shaderWrapperSolid;
+		//}
 
         /// <summary>
         /// initialise OGL3TextureTargetFactory that will generate TextureTargets
@@ -335,10 +406,40 @@ namespace SharpCEGui.OpenGLRenderer
             OpenGL.GL.BindBuffer(OpenGL.BufferTarget.ArrayBuffer, 0);
         }
 
-        #region Fields
+        private void RestoreChangedStatesToDefaults(bool isAfterRendering)
+        {
+	        //Resetting to initial values of the functions
+	        d_openGLStateChanger.ActiveTexture(0);
+	        d_openGLStateChanger.BindTexture(OpenGL.TextureTarget.Texture2D, 0);
 
-        //! Wrapper of the OpenGL shader we will use for textured geometry
-        protected OpenGLBaseShaderWrapper d_shaderWrapperTextured;
+	        if (true/*OpenGLInfo::getSingleton().isPolygonModeSupported()*/)
+		        OpenGL.GL.PolygonMode(OpenGL.MaterialFace.FrontAndBack, OpenGL.PolygonMode.Fill);
+
+	        d_openGLStateChanger.Disable(OpenGL.EnableCap.CullFace);
+	        d_openGLStateChanger.Disable(OpenGL.EnableCap.DepthTest);
+
+	        // During the preparation before rendering, these states will be changed anyways
+	        // so we do not want to change them extra
+	        if (isAfterRendering)
+	        {
+		        d_openGLStateChanger.Disable(OpenGL.EnableCap.Blend);
+		        d_openGLStateChanger.Disable(OpenGL.EnableCap.ScissorTest);
+	        }
+
+	        d_openGLStateChanger.BlendFunc(OpenGL.BlendingFactorSrc.One, OpenGL.BlendingFactorDest.Zero);
+
+	        d_openGLStateChanger.UseProgram(0);
+	        if (true/*OpenGLInfo::getSingleton().isVaoSupported()*/)
+		        d_openGLStateChanger.BindVertexArray(0);
+
+	        d_openGLStateChanger.BindBuffer(OpenGL.BufferTarget.ElementArrayBuffer, 0);
+	        d_openGLStateChanger.BindBuffer(OpenGL.BufferTarget.ArrayBuffer, 0);
+        }
+
+		#region Fields
+
+		//! Wrapper of the OpenGL shader we will use for textured geometry
+		protected OpenGLBaseShaderWrapper d_shaderWrapperTextured;
         
         //! Wrapper of the OpenGL shader we will use for solid geometry
         protected OpenGLBaseShaderWrapper d_shaderWrapperSolid;

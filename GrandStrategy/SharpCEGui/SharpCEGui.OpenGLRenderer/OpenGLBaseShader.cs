@@ -1,4 +1,5 @@
 ﻿using System;
+using Lunatics.SDLGL;
 
 namespace SharpCEGui.OpenGLRenderer
 {
@@ -14,18 +15,54 @@ namespace SharpCEGui.OpenGLRenderer
                                 string fragment_shader_source,
                                 OpenGLBaseStateChangeWrapper glStateChanger)
         {
-            throw new NotImplementedException();
-        }
+	        d_glStateChanger = glStateChanger;
+	        d_createdSuccessfully = false;
+	        d_vertexShader = 0;
+	        d_fragmentShader = 0;
+	        d_geometryShader = 0;
+	        d_program = 0;
 
-        // TODO: ~OpenGLBaseShader();
 
-        /// <summary>
-        /// Bind the shader to the OGL state-machine
-        /// </summary>
-        public void Bind()
+			// Compile the shaders
+
+			d_vertexShader = Compile(OpenGL.ShaderType.VertexShader, vertex_shader_source);
+			if (d_vertexShader == 0)
+				return;
+
+			OpenGLRendererBase.CheckGLErrors();
+
+			if (!string.IsNullOrWhiteSpace(fragment_shader_source))
+			{
+				d_fragmentShader = Compile(OpenGL.ShaderType.FragmentShader, fragment_shader_source);
+
+				if (d_fragmentShader == 0)
+					return;
+			}
+
+			OpenGLRendererBase.CheckGLErrors();
+
+			d_program = OpenGL.GL.CreateProgram();
+		}
+
+		// TODO://OpenGLBaseShader::~OpenGLBaseShader()
+		//{
+		//	if (d_program != 0)
+		//		glDeleteProgram(d_program);
+		//	if (d_vertexShader != 0)
+		//		glDeleteShader(d_vertexShader);
+		//	if (d_fragmentShader != 0)
+		//		glDeleteShader(d_fragmentShader);
+		//	if (d_geometryShader != 0)
+		//		glDeleteShader(d_geometryShader);
+		//}
+
+		/// <summary>
+		/// Bind the shader to the OGL state-machine
+		/// </summary>
+		public void Bind()
         {
-            throw new NotImplementedException();
-        }
+			d_glStateChanger.UseProgram(d_program);
+		}
 
         /// <summary>
         /// Query the location of a vertex attribute inside the shader.
@@ -34,8 +71,8 @@ namespace SharpCEGui.OpenGLRenderer
         /// <returns></returns>
         public int /*GLint*/ GetAttribLocation(string name)
         {
-            throw new NotImplementedException();
-        }
+			return OpenGL.GL.GetAttribLocation(d_program, name);
+		}
 
         /// <summary>
         /// Query the location of a uniform variable inside the shader.
@@ -44,8 +81,8 @@ namespace SharpCEGui.OpenGLRenderer
         /// <returns></returns>
         public int /*GLint*/ GetUniformLocation(string name)
         {
-            throw new NotImplementedException();
-        }
+			return OpenGL.GL.GetUniformLocation(d_program, name);
+		}
 
         /// <summary>
         /// Defines the name of the variable inside the shader which represents the
@@ -54,45 +91,103 @@ namespace SharpCEGui.OpenGLRenderer
         /// <param name="name"></param>
         public virtual void BindFragDataLocation(string name)
         {
-            throw new NotImplementedException();
-        }
+			if (d_program > 0)
+				Link();
+		}
 
         public bool IsCreatedSuccessfully()
         {
-            throw new NotImplementedException();
-        }
+			return d_createdSuccessfully;
+		}
 
         public virtual void Link()
         {
-            throw new NotImplementedException();
-        }
+			// Attach shaders and link
+			OpenGL.GL.AttachShader(d_program, d_vertexShader);
 
-        private uint /*GLuint*/ Compile(uint /*GLuint*/ type, string source)
-        {
-            throw new NotImplementedException();
-        }
+			if (d_geometryShader != 0)
+				OpenGL.GL.AttachShader(d_program, d_geometryShader);
 
-        private void OutputShaderLog(uint /*GLuint*/ shader)
-        {
-            throw new NotImplementedException();
-        }
+			if (d_fragmentShader != 0)
+				OpenGL.GL.AttachShader(d_program, d_fragmentShader);
 
-        private void OutputProgramLog(uint /*GLuint*/ program)
+			OpenGL.GL.LinkProgram(d_program);
+
+			// Check for problems
+			OpenGL.GL.GetProgram(d_program, OpenGL.GetProgramParameterName.LinkStatus, out var status);
+
+			if (status == 0)
+			{
+				OutputProgramLog(d_program);
+
+				OpenGL.GL.DeleteProgram(d_program);
+				d_program = 0;
+			}
+
+			OpenGLRendererBase.CheckGLErrors();
+
+			if (d_program == 0)
+				return;
+
+			d_createdSuccessfully = true;
+			OpenGLRendererBase.CheckGLErrors();
+		}
+
+        private int /*GLuint*/ Compile(OpenGL.ShaderType type, string source)
         {
-            throw new NotImplementedException();
-        }
+	        OpenGLRendererBase.CheckGLErrors();
+
+			var shader = OpenGL.GL.CreateShader(type);
+
+			if (shader == 0)
+				throw new Exception/*RendererException*/($"Critical Error - Could not create shader object of type:{type}.");
+
+			OpenGLRendererBase.CheckGLErrors();
+
+			// Define shader source and compile
+			OpenGL.GL.ShaderSource(shader, source);
+
+			OpenGL.GL.CompileShader(shader);
+
+			// Check for errors
+			OpenGL.GL.GetShader(shader, OpenGL.ShaderParameter.CompileStatus, out var status);
+
+			if (status ==0)
+			{
+				OutputShaderLog(shader);
+				return 0;
+			}
+
+			OpenGLRendererBase.CheckGLErrors();
+
+			return shader;
+		}
+
+        private void OutputShaderLog(int /*GLuint*/ shader)
+        {
+	        var log = OpenGL.GL.GetShaderInfoLog(shader);
+	        if (!string.IsNullOrWhiteSpace(log))
+		        throw new Exception/*RendererException*/($"OpenGLBaseShader linking has failed.\n{log}");
+		}
+
+        private void OutputProgramLog(int /*GLuint*/ program)
+        {
+			var log = OpenGL.GL.GetProgramInfoLog(program);
+			if (!string.IsNullOrWhiteSpace(log))
+				throw new Exception/*RendererException*/($"OpenGLBaseShader linking has failed.\n{log}");
+		}
 
         #region Fields
 
-        protected uint /*GLuint*/ d_program;
+        protected int /*GLuint*/ d_program;
 
         private OpenGLBaseStateChangeWrapper d_glStateChanger;
 
         private bool d_createdSuccessfully;
 
-        private uint /*GLuint*/ d_vertexShader;
-        private uint /*GLuint*/ d_fragmentShader;
-        private uint /*GLuint*/ d_geometryShader;
+        private int /*GLuint*/ d_vertexShader;
+        private int /*GLuint*/ d_fragmentShader;
+        private int /*GLuint*/ d_geometryShader;
 
         #endregion
     }

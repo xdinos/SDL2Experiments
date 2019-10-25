@@ -129,7 +129,7 @@ namespace Lunatics.SDLGL
 			ColorBufferBit = 0x00004000,
 		}
 
-		internal enum ErrorCode
+		public enum ErrorCode
 		{
 			NoError = 0,
 		}
@@ -607,8 +607,8 @@ namespace Lunatics.SDLGL
 			public static ViewportDelegate Viewport;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate ErrorCode GetErrorDelegate();
-			internal static GetErrorDelegate GetError;
+			public delegate ErrorCode GetErrorDelegate();
+			public static GetErrorDelegate GetError;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			internal delegate void FlushDelegate();
@@ -841,8 +841,8 @@ namespace Lunatics.SDLGL
 			public static DeleteShaderDelegate DeleteShader;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate int GetAttribLocationDelegate(int programId, string name);
-			internal static GetAttribLocationDelegate GetAttribLocation;
+			public delegate int GetAttribLocationDelegate(int programId, string name);
+			public static GetAttribLocationDelegate GetAttribLocation;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			public delegate int GetUniformLocationDelegate(int programId, string name);

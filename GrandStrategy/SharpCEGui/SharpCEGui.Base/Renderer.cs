@@ -24,14 +24,12 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SharpCEGui.Base
 {
-
-    
-
     /// <summary>
     /// Abstract class defining the basic required interface for Renderer objects.
     /// 
@@ -42,7 +40,11 @@ namespace SharpCEGui.Base
     /// </summary>
     public abstract class Renderer
     {
-        public abstract int TextureTargetsCount { get; }
+	    //! This is the DPI value that was assumed up to CEGUI version 0.8.X
+	    public static int ReferenceDpiValue = 96;
+
+
+		public abstract int TextureTargetsCount { get; }
 
         public int GeometryBuffersRendered { get; set; }
         public int GeometryBuffersVertexRendered { get; set; }
@@ -71,16 +73,16 @@ namespace SharpCEGui.Base
         /// <returns>GeometryBuffer object.</returns>
         public abstract GeometryBuffer CreateGeometryBufferTextured(RenderMaterial renderMaterial);
 
-        /// <summary>
-        /// Creates a GeometryBuffer for textured geometry with its default RenderMaterial and return a
-        /// reference to it.
-        /// You should remove the GeometryBuffer from any RenderQueues and call destroyGeometryBuffer
-        /// when you want to destroy the GeometryBuffer.
-        /// </summary>
-        /// <returns>
-        /// GeometryBuffer object.
-        /// </returns>
-        public GeometryBuffer CreateGeometryBufferTextured()
+		/// <summary>
+		/// Creates a GeometryBuffer for textured geometry with its default RenderMaterial and return a
+		/// reference to it.
+		/// You should remove the GeometryBuffer from any RenderQueues and call destroyGeometryBuffer
+		/// when you want to destroy the GeometryBuffer.
+		/// </summary>
+		/// <returns>
+		/// GeometryBuffer object.
+		/// </returns>
+		public GeometryBuffer CreateGeometryBufferTextured()
         {
             return CreateGeometryBufferTextured(CreateRenderMaterial(DefaultShaderType.Textured));
         }
@@ -149,17 +151,28 @@ namespace SharpCEGui.Base
         }
 
         /// <summary>
-        /// Create a TextureTarget that can be used to cache imagery; this is a
-        /// RenderTarget that does not lose it's content from one frame to another.
-        /// 
-        /// If the renderer is unable to offer such a thing, null should be returned.
+        /// Goes through all geometry buffers and updates their texture
+        /// coordinates if the texture matches the supplied texture.
         /// </summary>
-        /// <param name="addStencilBuffer"></param>
-        /// <returns>
-        /// Pointer to a TextureTarget object that is suitable for caching imagery,
-        /// or null if the renderer is unable to offer such a thing.
-        /// </returns>
-        public abstract ITextureTarget CreateTextureTarget(bool addStencilBuffer);
+        /// <param name="texture"></param>
+        /// <param name="scaleFactor"></param>
+        public void UpdateGeometryBufferTexCoords(Texture texture, float scaleFactor)
+        {
+			throw new NotImplementedException();
+        }
+
+		/// <summary>
+		/// Create a TextureTarget that can be used to cache imagery; this is a
+		/// RenderTarget that does not lose it's content from one frame to another.
+		/// 
+		/// If the renderer is unable to offer such a thing, null should be returned.
+		/// </summary>
+		/// <param name="addStencilBuffer"></param>
+		/// <returns>
+		/// Pointer to a TextureTarget object that is suitable for caching imagery,
+		/// or null if the renderer is unable to offer such a thing.
+		/// </returns>
+		public abstract ITextureTarget CreateTextureTarget(bool addStencilBuffer);
 
         /// <summary>
         /// Function that cleans up TextureTarget objects created with the
@@ -330,7 +343,8 @@ namespace SharpCEGui.Base
         /// <returns>
         /// Vector2 object that describes the resolution of the display or host window in DPI.
         /// </returns>
-        public abstract Lunatics.Mathematics.Vector2 GetDisplayDotsPerInch();
+        [Obsolete("")]
+		public abstract Lunatics.Mathematics.Vector2 GetDisplayDotsPerInch();
 
         /// <summary>
         /// Return the pixel size of the maximum supported texture.
@@ -377,13 +391,16 @@ namespace SharpCEGui.Base
             }
         }
 
-        /// <summary>
-        /// Sets the active render target.
-        /// </summary>
-        /// <param name="renderTarget">
-        /// The active RenderTarget.
-        /// </param>
-        public void SetActiveRenderTarget(IRenderTarget renderTarget)
+        public virtual void UploadBuffers(RenderingSurface surface) { }
+        public virtual void UploadBuffers(IEnumerable<GeometryBuffer> buffers) {}
+
+		/// <summary>
+		/// Sets the active render target.
+		/// </summary>
+		/// <param name="renderTarget">
+		/// The active RenderTarget.
+		/// </param>
+		public void SetActiveRenderTarget(IRenderTarget renderTarget)
         {
             d_activeRenderTarget = renderTarget;
         }
@@ -421,14 +438,75 @@ namespace SharpCEGui.Base
             return d_viewProjectionMatrix;
         }
 
-        /// <summary>
-        /// Adds a created GeometryBuffer, which was returned when calling one of the
-        /// createGeometryBuffer functions, to the list of GeometryBuffers.
-        /// </summary>
-        /// <param name="geometryBuffer">
-        /// The GeometryBuffer object to be destroyed.
-        /// </param>
-        protected void AddGeometryBuffer(GeometryBuffer geometryBuffer)
+
+        /*!
+   \brief
+       Returns if the texture coordinate system is vertically flipped or not. The original of a
+       texture coordinate system is typically located either at the the top-left or the bottom-left.
+       CEGUI, Direct3D and most rendering engines assume it to be on the top-left. OpenGL assumes it to
+       be at the bottom left.        
+
+       This function is intended to be used when generating geometry for rendering the TextureTarget
+       onto another surface. It is also intended to be used when trying to use a custom texture (RTT)
+       inside CEGUI using the Image class, in order to determine the Image coordinates correctly.
+
+   \return
+       - true if flipping is required: the texture coordinate origin is at the bottom left
+       - false if flipping is not required: the texture coordinate origin is at the top left
+   */
+        public abstract bool IsTexCoordSystemFlipped();
+
+		/// <summary>
+		/// Gets the Font scale factor to be used when rendering scalable Fonts.
+		/// </summary>
+		/// <returns>
+		/// The currently set Font scale factor
+		/// </returns>
+		public float GetFontScale()
+        {
+	        return d_fontScale;
+        }
+
+		/*!
+   \brief
+	   Sets the Font scale factor to be used when rendering scalable Fonts.
+
+	   This updates all Fonts but will not invalidate the Windows. If you
+	   want to also invalidate all Windows to be affected by all Fonts,
+	   you have to do this after setting the new Font scale manually.
+   */
+		void setFontScale(float fontScale)
+		{
+			throw new NotImplementedException();
+		}
+
+		/*!
+\brief
+	Calculates and returns the font scale factor, based on the 
+	reference DPI value of 96, which was assumed as fixed DPI up to
+	CEGUI 0.8.X. Point sizes are rendered in CEGUI based on this fixed
+	DPI. If you want to render point sizes according to a higher DPI,
+	use this function together with setFontScale.
+
+\return
+	The result of dpiValue / ReferenceDpiValue
+
+\see Renderer::setFontScale
+\see System::getSystemDPI
+*/
+		public static float DpiToFontScale(float dpiValue)
+		{
+			return dpiValue / ReferenceDpiValue;
+		}
+
+	/// <summary>
+	/// Adds a created GeometryBuffer, which was returned when calling one of the
+	/// createGeometryBuffer functions, to the list of GeometryBuffers.
+	/// </summary>
+	/// <param name="geometryBuffer">
+	/// The GeometryBuffer object to be destroyed.
+	/// </param>
+	protected void AddGeometryBuffer(GeometryBuffer geometryBuffer)
         {
             d_geometryBuffers.Add(geometryBuffer);
         }
@@ -443,9 +521,12 @@ namespace SharpCEGui.Base
         /// </summary>
         protected /*glm::mat4*/Lunatics.Mathematics.Matrix d_viewProjectionMatrix;
 
-        /// <summary>
-        /// Container used to track geometry buffers.
-        /// </summary>
-        private readonly List<GeometryBuffer> d_geometryBuffers = new List<GeometryBuffer>();
+        //! The Font scale factor to be used when rendering Fonts (except Bitmap Fonts).
+        private float d_fontScale;
+
+	/// <summary>
+	/// Container used to track geometry buffers.
+	/// </summary>
+	private readonly List<GeometryBuffer> d_geometryBuffers = new List<GeometryBuffer>();
     }
 }

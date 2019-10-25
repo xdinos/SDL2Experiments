@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Lunatics.SDLGL;
 using SharpCEGui.Base;
 
@@ -15,14 +16,57 @@ using SharpCEGui.Base;
 
 namespace SharpCEGui.OpenGLRenderer
 {
-    /// <summary>
-    /// Common base class used for other OpenGL based renderer modules.
-    /// </summary>
-    public abstract class OpenGLRendererBase : Renderer, IDisposable
+	/// <summary>
+	/// Common base class used for other OpenGL (desktop or ES) based renderer modules.
+	/// </summary>
+	public abstract class OpenGLRendererBase : Renderer, IDisposable
     {
-        // implement Renderer interface
+	    internal static void CheckGLErrors([CallerFilePath] string file = "",
+	                                       [CallerLineNumber] int line = 0,
+	                                       [CallerMemberName] string function = "")
+	    {
+		    var error = OpenGL.GL.GetError();
 
-        public override int TextureTargetsCount
+		    if (error != OpenGL.ErrorCode.NoError)
+		    {
+				//std::stringstream stringStream;
+				//stringStream << "OpenGLBaseRenderer - One or multiple OpenGL error have occured."
+				//             << "Detected in function '" << function << "' (" << fileName << ":" <<
+				//             line << ")" << std::endl;
+
+				//switch (error)
+				//{
+				//	case GL_INVALID_ENUM:
+				//		stringStream << "GL_INVALID_ENUM: enum argument out of range." << std::endl;
+				//		break;
+				//	case GL_INVALID_VALUE:
+				//		stringStream << "GL_INVALID_VALUE: Numeric argument out of range." << std::endl;
+				//		break;
+				//	case GL_INVALID_OPERATION:
+				//		stringStream << "GL_INVALID_OPERATION: Operation illegal in current state." << std::endl;
+				//		break;
+				//	case GL_INVALID_FRAMEBUFFER_OPERATION:
+				//		stringStream << "GL_INVALID_FRAMEBUFFER_OPERATION: Framebuffer object is not complete." << std::endl;
+				//		break;
+				//	case GL_OUT_OF_MEMORY:
+				//		stringStream << "GL_OUT_OF_MEMORY: Not enough memory left to execute command." << std::endl;
+				//		break;
+				//	default:
+				//		stringStream << "GL_ERROR: Unknown error." << std::endl;
+				//}
+
+				//if (CEGUI::Logger * logger = CEGUI::Logger::getSingletonPtr())
+				//	logger->logEvent(stringStream.str().c_str());
+				//else
+				//	std::cerr << stringStream.str() << std::endl;
+
+				System.Diagnostics.Debug.WriteLine($"GL_ERROR: {error}");
+			}
+	    }
+
+	    // implement Renderer interface
+
+		public override int TextureTargetsCount
         {
             get { return d_textureTargets.Count; }
         }
@@ -216,6 +260,12 @@ namespace SharpCEGui.OpenGLRenderer
             return d_rendererID;
         }
 
+        public override bool IsTexCoordSystemFlipped()
+        {
+	        throw new NotImplementedException();
+        }
+        
+
         /*!
         \brief
             Create a texture that uses an existing OpenGL texture with the specified
@@ -252,18 +302,41 @@ namespace SharpCEGui.OpenGLRenderer
             return t;
         }
 
-        /// <summary>
-        /// Tells the renderer to initialise some extra states beyond what it
-        /// directly needs itself for CEGUI.
-        /// 
-        /// This option is useful in cases where you've made changes to the default
-        /// OpenGL state and do not want to save/restore those between CEGUI
-        /// rendering calls.  Note that this option will not deal with every
-        /// possible state or extension - if you want a state added here, make a
-        /// request and we'll consider it ;)
-        /// </summary>
-        /// <param name="setting"></param>
-        public void EnableExtraStateSettings(bool setting)
+        /*!
+    \brief
+        Tells the renderer to enable/disable the resetting of most states used by
+        CEGUI to their default values (OpenGL3Renderer) or their previously set
+        values (OpenGLRenderer).
+
+        Since the amount of states used by CEGUI is very large and we can't
+        store a temporary for each of them and restore them, the user is responsible
+        for setting the states to the expects ones once CEGUI is done rendering.
+    */
+        public void SetStateResettingEnabled(bool setting) { throw new NotImplementedException();}
+		
+		/// <summary>
+		/// Returns if state resetting is enabled or disabled in this Renderer.
+		/// </summary>
+		/// <returns>
+		/// True if state resetting is enabled, False if state resetting is disabled.
+		/// </returns>
+		public bool GetStateResettingEnabled()
+        {
+	        throw new NotImplementedException();}
+
+		/// <summary>
+		/// Tells the renderer to initialise some extra states beyond what it
+		/// directly needs itself for CEGUI.
+		/// 
+		/// This option is useful in cases where you've made changes to the default
+		/// OpenGL state and do not want to save/restore those between CEGUI
+		/// rendering calls.  Note that this option will not deal with every
+		/// possible state or extension - if you want a state added here, make a
+		/// request and we'll consider it ;)
+		/// </summary>
+		/// <param name="setting"></param>
+		[Obsolete]
+		public void EnableExtraStateSettings(bool setting)
         {
             ThrowIfDisposed();
             d_initExtraStates = setting;
@@ -314,13 +387,13 @@ namespace SharpCEGui.OpenGLRenderer
         /// </returns>
         public abstract Sizef GetAdjustedTextureSize(Sizef sz);
 
-        /// <summary>
-        /// Utility function that will return \a f if it's a power of two, or the
-        /// next power of two up from \a f if it's not.
-        /// </summary>
-        /// <param name="f"></param>
-        /// <returns></returns>
-        public static float GetNextPowerOfTwoSize(float f)
+		/// <summary>
+		/// Utility function that will return \a f if it's a power of two, or the
+		/// next power of two up from \a f if it's not.
+		/// </summary>
+		/// <param name="f"></param>
+		/// <returns></returns>
+		public static float GetNextPowerOfTwoSize(float f)
         {
             var size = (uint) f;
 
@@ -340,16 +413,14 @@ namespace SharpCEGui.OpenGLRenderer
             return (float)(size);
         }
 
-        //! set the render states for the specified BlendMode.
-        public abstract void SetupRenderingBlendMode(BlendMode mode, bool force = false);
-        
-        /// <summary>
-        /// Return whether EXT_texture_compression_s3tc is supported
-        /// </summary>
-        /// <returns></returns>
-        public abstract bool IsS3TCSupported();
+		/// <summary>
+		/// set the render states for the specified BlendMode.
+		/// </summary>
+		/// <param name="mode"></param>
+		/// <param name="force"></param>
+		public abstract void SetupRenderingBlendMode(BlendMode mode, bool force = false);
 
-        /// <summary>
+		/// <summary>
         /// Helper to get the viewport.
         /// </summary>
         /// <returns>
@@ -359,16 +430,19 @@ namespace SharpCEGui.OpenGLRenderer
         {
             return d_activeRenderTarget.GetArea();
         }
-       
-        protected OpenGLRendererBase()
-        {
-            d_displayDPI = new Lunatics.Mathematics.Vector2(96, 96);
-            d_initExtraStates = false;
-            d_activeBlendMode = BlendMode.Invalid;
 
-            InitialiseMaxTextureSize();
+		/// <summary>
+		/// Return whether EXT_texture_compression_s3tc is supported
+		/// </summary>
+		/// <returns></returns>
+		[Obsolete]
+		public abstract bool IsS3TCSupported();
+
+
+		protected OpenGLRendererBase()
+        {
+	        Init();
             InitialiseDisplaySizeWithViewportSize();
-            
             d_defaultTarget = new OpenGLViewportTarget(this);
         }
 
@@ -380,19 +454,45 @@ namespace SharpCEGui.OpenGLRenderer
         /// </param>
         protected OpenGLRendererBase(Sizef displaySize)
         {
-            d_displaySize = displaySize;
-            d_displayDPI = new Lunatics.Mathematics.Vector2(96f, 96f);
-            d_initExtraStates = false;
-            d_activeBlendMode = BlendMode.Invalid;
+	        d_displaySize = displaySize;
 
-            InitialiseMaxTextureSize();
-            
+			Init();
             d_defaultTarget = new OpenGLViewportTarget(this);
         }
 
-        #region Implementation of IDisposable
+        protected void Init(bool init_glew = false, bool set_glew_experimental = false)
+        {
+	        d_isStateResettingEnabled = true;
+	        d_activeBlendMode = BlendMode.Invalid;
 
-        ~OpenGLRendererBase()
+//#if defined CEGUI_USE_GLEW
+//		    if (init_glew)
+//		    {
+//		        if (set_glew_experimental)
+//		            glewExperimental = GL_TRUE;
+//		        GLenum err = glewInit();
+//		        if(err != GLEW_OK)
+//		        {
+//		            std::ostringstream err_string;
+//		            //Problem: glewInit failed, something is seriously wrong.
+//		            err_string << "failed to initialise the GLEW library. " << glewGetErrorString(err);
+//
+//		            throw RendererException(err_string.str().c_str());
+//		        }
+//		        //Clear the useless error glew produces as of version 1.7.0, when using OGL3.2 Core Profile
+//		        glGetError();
+//		    }
+//#else
+//	        CEGUI_UNUSED(init_glew);
+//	        CEGUI_UNUSED(set_glew_experimental);
+//#endif
+	        // TODO: ... OpenGLInfo::getSingleton().init();
+	        InitialiseMaxTextureSize();
+		}
+
+		#region Implementation of IDisposable
+
+		~OpenGLRendererBase()
         {
             Dispose(false);
         }
@@ -516,6 +616,7 @@ namespace SharpCEGui.OpenGLRenderer
         /// <summary>
         /// What the renderer considers to be the current display DPI resolution.
         /// </summary>
+        [Obsolete]
         protected Lunatics.Mathematics.Vector2 d_displayDPI;
         
         /// <summary>
@@ -535,26 +636,33 @@ namespace SharpCEGui.OpenGLRenderer
         //typedef std::vector<OpenGLGeometryBufferBase*> GeometryBufferList;
         
         //! Container used to track geometry buffers.
+		[Obsolete]
         private readonly List<OpenGLGeometryBufferBase> d_geometryBuffers = new List<OpenGLGeometryBufferBase>();
         
         //! container type used to hold Textures we create.
         //typedef std::map<String, OpenGLTexture*, StringFastLessCompare
         //                 CEGUI_MAP_ALLOC(String, OpenGLTexture*)> TextureMap;
-        
+
         /// <summary>
         /// Container used to track textures.
         /// </summary>
-        private readonly Dictionary<string, OpenGLTexture> d_textures=new Dictionary<string, OpenGLTexture>();
+        private readonly Dictionary<string, OpenGLTexture> d_textures = new Dictionary<string, OpenGLTexture>();
         
         /// <summary>
         /// What the renderer thinks the max texture size is.
         /// </summary>
         protected int d_maxTextureSize;
-        
-        /// <summary>
-        /// option of whether to initialise extra states that may not be at default
-        /// </summary>
-        protected bool d_initExtraStates;
+
+		/// <summary>
+		/// option of whether to initialise extra states that may not be at default
+		/// </summary>
+		protected bool d_isStateResettingEnabled;
+
+		/// <summary>
+		/// option of whether to initialise extra states that may not be at default
+		/// </summary>
+		[Obsolete]
+		protected bool d_initExtraStates;
         
         /// <summary>
         /// What blend mode we think is active.
