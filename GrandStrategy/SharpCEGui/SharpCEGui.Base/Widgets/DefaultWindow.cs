@@ -26,90 +26,90 @@
 
 namespace SharpCEGui.Base.Widgets
 {
-    /// <summary>
-    /// Window class intended to be used as a simple, generic Window.
-    /// 
-    /// This class does no rendering and so appears totally transparent.  This window defaults
-    /// to position 0.0f, 0.0f with a size of 1.0f x 1.0f.
-    /// <para>
-    /// This Window has been used as the root GUI-sheet (root window) but it's usage has been extended
-    /// beyond that. That's why it's name has been changed to "DefaultWindow" for 0.8.</para>
-    /// </summary>
-    public class DefaultWindow : Window
-    {
-        /// <summary>
-        /// The unique typename of this widget
-        /// </summary>
-        public const string WidgetTypeName = "DefaultWindow";
+	/// <summary>
+	/// Window class intended to be used as a simple, generic Window.
+	/// 
+	/// This class does no rendering and so appears totally transparent.  This window defaults
+	/// to position 0.0f, 0.0f with a size of 1.0f x 1.0f.
+	/// <para>
+	/// This Window has been used as the root GUI-sheet (root window) but it's usage has been extended
+	/// beyond that. That's why it's name has been changed to "DefaultWindow" for 0.8.</para>
+	/// </summary>
+	public class DefaultWindow : Window
+	{
+		/// <summary>
+		/// The unique typename of this widget
+		/// </summary>
+		public const string WidgetTypeName = "DefaultWindow";
 
-        /// <summary>
-        /// Constructor for DefaultWindows.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="name"></param>
-        public DefaultWindow(string type, string name)
-            : base(type, name)
-        {
-            //SetMaxSize(new USize(UDim.Absolute(Single.MaxValue), UDim.Absolute(Single.MaxValue)));
-            SetSize(new USize(UDim.Relative(1.0f), UDim.Relative(1.0f)));
-        }
+		/// <summary>
+		/// Constructor for DefaultWindows.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="name"></param>
+		public DefaultWindow(string type, string name)
+			: base(type, name)
+		{
+			//SetMaxSize(new USize(UDim.Absolute(Single.MaxValue), UDim.Absolute(Single.MaxValue)));
+			SetSize(new USize(UDim.Relative(1.0f), UDim.Relative(1.0f)));
+		}
 
-        #region overridden functions from Window base class
-        
-        protected override bool  MoveToFrontImpl(bool wasClicked)
-        {
-            var tookAction = base.MoveToFrontImpl(wasClicked);
+		#region overridden functions from Window base class
 
-            if (d_parent==null && _cursorPassThroughEnabled)
-                return false;
+		protected override bool MoveToFrontImpl(bool wasClicked)
+		{
+			var tookAction = base.MoveToFrontImpl(wasClicked);
 
-            return tookAction;
-        }
-        
-        #endregion
-        
-        #region override the mouse event handlers
+			if (d_parent == null && _cursorPassThroughEnabled)
+				return false;
 
-        protected internal override void OnCursorMove(CursorInputEventArgs e)
-        {
-            // always call the base class handler
-            base.OnCursorMove(e);
-            UpdatePointerEventHandled(e);
-        }
+			return tookAction;
+		}
 
-        protected internal override void OnScroll(CursorInputEventArgs e)
-        {
-            // always call the base class handler
-            base.OnScroll(e);
-            UpdatePointerEventHandled(e);
-        }
+		#endregion
 
-        protected internal override void OnCursorPressHold(CursorInputEventArgs e)
-        {
-            // always call the base class handler
-            base.OnCursorPressHold(e);
-            UpdatePointerEventHandled(e);
-        }
+		#region override the mouse event handlers
 
-        protected internal override void OnCursorActivate(CursorInputEventArgs e)
-        {
-            // always call the base class handler
-            base.OnCursorActivate(e);
-            UpdatePointerEventHandled(e);
-        }
-        
-        #endregion
-        
-        /// <summary>
-        /// helper to update mouse input handled state
-        /// </summary>
-        /// <param name="e"></param>
-        protected void UpdatePointerEventHandled(CursorInputEventArgs e)
-        {
-            // by default, if we are a root window (no parent) with pass-though enabled
-            // we do /not/ mark mouse events as handled.
-            if (d_parent==null && e.handled!=0 && _cursorPassThroughEnabled)
-                --e.handled;
-        }
-    }
+		protected internal override void OnCursorMove(CursorInputEventArgs e)
+		{
+			// always call the base class handler
+			base.OnCursorMove(e);
+			UpdatePointerEventHandled(e);
+		}
+
+		protected internal override void OnScroll(CursorInputEventArgs e)
+		{
+			// always call the base class handler
+			base.OnScroll(e);
+			UpdatePointerEventHandled(e);
+		}
+
+		protected internal override void OnCursorPressHold(CursorInputEventArgs e)
+		{
+			// always call the base class handler
+			base.OnCursorPressHold(e);
+			UpdatePointerEventHandled(e);
+		}
+
+		protected internal override void OnCursorActivate(CursorInputEventArgs e)
+		{
+			// always call the base class handler
+			base.OnCursorActivate(e);
+			UpdatePointerEventHandled(e);
+		}
+
+		#endregion
+
+		/// <summary>
+		/// helper to update mouse input handled state
+		/// </summary>
+		/// <param name="e"></param>
+		protected void UpdatePointerEventHandled(CursorInputEventArgs e)
+		{
+			// by default, if we are a root window (no parent) with pass-though enabled
+			// we do /not/ mark mouse events as handled.
+			if (d_parent == null && e.handled != 0 && _cursorPassThroughEnabled)
+				--e.handled;
+		}
+	}
 }

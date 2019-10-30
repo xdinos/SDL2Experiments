@@ -12,10 +12,10 @@ using SharpCEGui.Base;
 
 namespace SharpCEGui.OpenGLRenderer
 {
-    /// <summary>
-    /// Texture implementation for the OpenGLRenderer.
-    /// </summary>
-    public class OpenGL1Texture : OpenGLTexture
+	/// <summary>
+	/// Texture implementation for the OpenGLRenderer.
+	/// </summary>
+	public class OpenGL1Texture : OpenGLTexture
     {
         public OpenGL1Texture(OpenGLRendererBase owner, string name)
                 : base(owner, name)
@@ -23,7 +23,7 @@ namespace SharpCEGui.OpenGLRenderer
         }
 
         //! Destructor.
-        // TODO: virtual ~OpenGL1Texture();
+        // TODO: virtual ~OpenGL1Texture() { }
 
         public override void BlitToMemory(byte[] targetData)
         {
@@ -57,9 +57,7 @@ namespace SharpCEGui.OpenGLRenderer
         /// </summary>
         protected override void SetTextureEnvironment()
         {
-	        OpenGL.GL.TexEnv(TextureEnvTarget.TextureEnv,
-	                         TextureEnvParameter.TextureEnvMode,
-	                         (int) /*All.Modulate*/0x2100);
+			// TODO: OpenGL.GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int) /*All.Modulate*/0x2100);
         }
 
         /// <summary>

@@ -276,12 +276,13 @@ namespace SharpCEGui.OpenGLRenderer
 		/// <summary>
 		/// creates a texture of GL3Texture type
 		/// </summary>
-		/// <param name="name"></param>
+		/// <param name="name"></param>*
+		/// 
 		/// <returns></returns>
 		protected override OpenGLTexture CreateTextureImpl(string name)
         {
-            throw new NotImplementedException();
-        }
+			return new OpenGL3Texture(this, name);
+		}
 
         protected void InitialiseRendererIDString()
         {

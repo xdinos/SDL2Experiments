@@ -659,8 +659,12 @@ namespace Lunatics.SDLGL
 			internal static Uniform4fvDelegate Uniform4fv;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
-			internal delegate void Uniform1iDelegate(int location, int value);
-			internal static Uniform1iDelegate Uniform1i;
+			public delegate void Uniform1iDelegate(int location, int value);
+			public static Uniform1iDelegate Uniform1i;
+
+			[System.Security.SuppressUnmanagedCodeSecurity()]
+			public delegate void Uniform1fDelegate(int location, float value);
+			public static Uniform1fDelegate Uniform1f;
 
 			[System.Security.SuppressUnmanagedCodeSecurity()]
 			private unsafe delegate void UniformMatrix4fvDelegate(int location, int size, bool transpose, float* values);
@@ -1281,7 +1285,7 @@ namespace Lunatics.SDLGL
 				TexParameteri(target, name, value);
 			}
 
-			internal static void GetTexImage<T>(TextureTarget target, int level, PixelFormat format, PixelType type, T[] pixels) where T : struct
+			public static void GetTexImage<T>(TextureTarget target, int level, PixelFormat format, PixelType type, T[] pixels) where T : struct
 			{
 				var pixelsPtr = GCHandle.Alloc(pixels, GCHandleType.Pinned);
 				try
@@ -1421,6 +1425,7 @@ namespace Lunatics.SDLGL
 				DrawElements = LoadFunction<DrawElementsDelegate>("glDrawElements");
 				DrawArrays = LoadFunction<DrawArraysDelegate>("glDrawArrays");
 				Uniform1i = LoadFunction<Uniform1iDelegate>("glUniform1i");
+				Uniform1f = LoadFunction<Uniform1fDelegate>("glUniform1f");
 				Uniform4fv = LoadFunction<Uniform4fvDelegate>("glUniform4fv");
 				UniformMatrix4fv = LoadFunction<UniformMatrix4fvDelegate>("glUniformMatrix4fv");
 				ReadPixelsInternal = LoadFunction<ReadPixelsDelegate>("glReadPixels");

@@ -380,17 +380,17 @@ namespace SharpCEGui.OpenGLRenderer
             OpenGL.GL.BindTexture(OpenGL.TextureTarget.Texture2D, d_ogltexture);
 
             OpenGL.GL.TexParameter(OpenGL.TextureTarget.Texture2D,
-                            OpenGL.TextureParameterName.TextureMagFilter,
-                            /*(int)All.Linear*/0x2601);
+                                   OpenGL.TextureParameterName.TextureMagFilter,
+                                   (int) OpenGL.TextureMagFilter.Linear);
             OpenGL.GL.TexParameter(OpenGL.TextureTarget.Texture2D,
-                            OpenGL.TextureParameterName.TextureMinFilter,
-                            /*(int)All.Linear*/0x2601);
+                                   OpenGL.TextureParameterName.TextureMinFilter,
+                                   (int) OpenGL.TextureMinFilter.Linear);
             OpenGL.GL.TexParameter(OpenGL.TextureTarget.Texture2D,
-                            OpenGL.TextureParameterName.TextureWrapS,
-                            /*(int) All.ClampToEdge*/0x812F);
+                                   OpenGL.TextureParameterName.TextureWrapS,
+                                   (int) OpenGL.TextureWrapMode.ClampToEdge);
             OpenGL.GL.TexParameter(OpenGL.TextureTarget.Texture2D,
-                            OpenGL.TextureParameterName.TextureWrapT,
-                            /*(int) All.ClampToEdge*/0x812F);
+                                   OpenGL.TextureParameterName.TextureWrapT,
+                                   (int) OpenGL.TextureWrapMode.ClampToEdge);
 
             SetTextureEnvironment();
 

@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <Compile Remove="MathematicsExtensions.cs" />
-    <Compile Remove="OpenGL1Texture.cs" />
     <Compile Remove="OpenGLFBOTextureTarget.cs" />
     <Compile Remove="OpenGLGeometryBuffer.cs" />
     <Compile Remove="OpenGLRenderer.cs" />

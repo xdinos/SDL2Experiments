@@ -62,7 +62,7 @@ namespace SharpCEGui.OpenGLRenderer
 
             // Set the uniform variables for this GeometryBuffer in the Shader
             shaderParameterBindings.SetParameter("modelViewProjMatrix", ref d_matrix);
-            shaderParameterBindings.SetParameter("alphaPercentage", d_alpha);
+            shaderParameterBindings.SetParameter("alphaFactor", d_alpha);
 
             // activate desired blending mode
             d_owner.SetupRenderingBlendMode(d_blendMode);

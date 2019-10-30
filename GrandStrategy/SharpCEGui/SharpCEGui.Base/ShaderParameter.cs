@@ -62,27 +62,36 @@ namespace SharpCEGui.Base
             d_parameterValue = parameterValue;
         }
 
-        //! Implementation of the shader_parameter interface
-        public override ShaderParamType GetParamType()
+        private ShaderParameterFloat(ShaderParameterFloat other)
+        {
+	        d_parameterValue = other.d_parameterValue;
+        }
+
+		//! Implementation of the shader_parameter interface
+		public override ShaderParamType GetParamType()
         {
             return ShaderParamType.SPT_FLOAT;
         }
 
         public override ShaderParameter Clone()
         {
-            throw new NotImplementedException();
-            // TODO: return new ShaderParameterFloat(*this);
+            return new ShaderParameterFloat(this);
         }
 
         public override bool Equal(ShaderParameter otherParameter)
         {
-            throw new NotImplementedException();
-        }
+	        if (GetParamType() == otherParameter.GetParamType())
+		        return (d_parameterValue == ((ShaderParameterFloat) otherParameter).d_parameterValue);
+
+			
+			return false;
+		}
 
         public override void TakeOverParameterValue(ShaderParameter otherParameter)
         {
-            throw new NotImplementedException();
-        }
+			if (GetParamType() == otherParameter.GetParamType())
+				d_parameterValue = ((ShaderParameterFloat)otherParameter).d_parameterValue;
+		}
 
         /// <summary>
         /// The float parameter value
@@ -175,34 +184,44 @@ namespace SharpCEGui.Base
     /// </summary>
     public class ShaderParameterMatrix : ShaderParameter
     {
-        public ShaderParameterMatrix(Lunatics.Mathematics.Matrix parameterValue)
-        {
-            d_parameterValue = parameterValue;
-        }
+	    public ShaderParameterMatrix(Lunatics.Mathematics.Matrix parameterValue)
+	    {
+		    d_parameterValue = parameterValue;
+	    }
 
-        //! Implementation of the shader_parameter interface
-        public override ShaderParamType GetParamType()
-        {
-            return ShaderParamType.SPT_MATRIX_4X4;
-        }
+	    private ShaderParameterMatrix(ShaderParameterMatrix other)
+	    {
+		    d_parameterValue = other.d_parameterValue;
+	    }
 
-        public override ShaderParameter Clone()
-        {
-            throw new NotImplementedException();
-            // return new ShaderParameterMatrix(*this);
-        }
+	    //! Implementation of the shader_parameter interface
+	    public override ShaderParamType GetParamType()
+	    {
+		    return ShaderParamType.SPT_MATRIX_4X4;
+	    }
 
-        public override bool Equal(ShaderParameter otherParameter)
-        {
-            throw new NotImplementedException();
-        }
+	    public override ShaderParameter Clone()
+	    {
+		    return new ShaderParameterMatrix(this);
+	    }
 
-        public override void TakeOverParameterValue(ShaderParameter otherParameter)
-        {
-            throw new NotImplementedException();
-        }
+	    public override bool Equal(ShaderParameter otherParameter)
+	    {
+		    if (GetParamType() == otherParameter.GetParamType())
+		    {
+			    return (d_parameterValue == ((ShaderParameterMatrix)otherParameter).d_parameterValue);
+		    }
+		    else
+			    return false;
+	    }
 
-        public Lunatics.Mathematics.Matrix d_parameterValue;
+	    public override void TakeOverParameterValue(ShaderParameter otherParameter)
+	    {
+		    if (GetParamType() == otherParameter.GetParamType())
+			    d_parameterValue = ((ShaderParameterMatrix) otherParameter).d_parameterValue;
+	    }
+
+	    public Lunatics.Mathematics.Matrix d_parameterValue;
     }
 
     public class ShaderParameterBindings
