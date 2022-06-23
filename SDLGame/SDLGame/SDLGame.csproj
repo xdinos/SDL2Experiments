@@ -163,7 +163,7 @@
       <Version>3.2.1</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>12.0.2</Version>
+      <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="StbImageSharp">
       <Version>2.22.2</Version>
